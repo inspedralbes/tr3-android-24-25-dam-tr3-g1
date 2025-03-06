@@ -1,0 +1,67 @@
+# Archivos y carpetas a ignorar en un proyecto Unity 2D
+
+/unity-project/Temp/
+/unity-project/Library/
+/unity-project/Logs/
+/unity-project/obj/
+/unity-project/Build/
+/unity-project/Builds/
+/unity-project/UserSettings/
+
+# Capturas de memoria y grabaciones
+/unity-project/[Mm]emoryCaptures/
+/unity-project/[Rr]ecordings/
+
+# Complementos y cachés
+/unity-project/[Aa]ssets/Plugins/Editor/JetBrains*
+/unity-project/.vs/
+/unity-project/.gradle/
+/unity-project/ExportedObj/
+/unity-project/.consulo/
+
+# Archivos de configuración y compilación
+/unity-project/*.csproj
+/unity-project/*.unityproj
+/unity-project/*.sln
+/unity-project/*.suo
+/unity-project/*.tmp
+/unity-project/*.user
+/unity-project/*.userprefs
+/unity-project/*.pidb
+/unity-project/*.booproj
+/unity-project/*.svd
+/unity-project/*.pdb
+/unity-project/*.mdb
+/unity-project/*.opendb
+/unity-project/*.VC.db
+
+# Archivos generados automáticamente
+/unity-project/sysinfo.txt
+/unity-project/*.apk
+/unity-project/*.aab
+/unity-project/*.unitypackage
+/unity-project/*.unitypackage.meta
+/unity-project/*.app
+/unity-project/crashlytics-build.properties
+
+# Datos de Addressables y StreamingAssets
+/unity-project/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/unity-project/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/unity-project/[Aa]ssets/[Ss]treamingAssets/aa/
+
+# Configuración de TextMesh Pro
+/unity-project/[Aa]ssets/TextMesh Pro/Resources/Font Asset Creator Settings.asset
+/unity-project/[Aa]ssets/TextMesh Pro/Resources/LineBreaking Following Characters.asset
+/unity-project/[Aa]ssets/TextMesh Pro/Resources/LineBreaking Leading Characters.asset
+
+# Datos de iluminación y Tilemaps
+/unity-project/[Aa]ssets/LightingData.asset
+/unity-project/[Aa]ssets/ReflectionProbe-*.exr
+/unity-project/[Aa]ssets/[Tt]ilemaps/*
+/unity-project/[Aa]ssets/[Tt]iles/*
+
+# Archivos de configuración específicos del repositorio
+/unity-project/.idea/
+/unity-project/*.iml
+/unity-project/.vscode/
+/unity-project/*.log

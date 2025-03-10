@@ -39,11 +39,11 @@ public class GridManager : MonoBehaviour
                 {
                     if (x % 2 == 0)
                     {
-                        spriteRenderer.color = (y % 2 == 0) ? Color.black : Color.white;
+                        spriteRenderer.color = (y % 2 == 0) ? new Color(0.0f, 0.5f, 0.0f) : new Color(0.0f, 0.8f, 0.0f);
                     }
                     else
                     {
-                        spriteRenderer.color = (y % 2 == 0) ? Color.white : Color.black;
+                        spriteRenderer.color = (y % 2 == 0) ? new Color(0.0f, 0.8f, 0.0f) : new Color(0.0f, 0.5f, 0.0f);
                     }
                 }
             }

@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniAnvil_0: -2561797560372251098
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

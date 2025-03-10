@@ -1060,7 +1060,44 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniMiner_0: -1678069435006654288
+      MiniMiner_1: -1106304226818118710
+      MiniMiner_10: 2197144203751791428
+      MiniMiner_11: 6588492295180949678
+      MiniMiner_12: -1336552904508235115
+      MiniMiner_13: -1031768655417285188
+      MiniMiner_14: 33823906094711468
+      MiniMiner_15: -201775622303268473
+      MiniMiner_16: -5734221367272940229
+      MiniMiner_17: 3845003218926407280
+      MiniMiner_18: -3357762560958188125
+      MiniMiner_19: 7398169101359330596
+      MiniMiner_2: 6896682100588991710
+      MiniMiner_20: -1291741178397477029
+      MiniMiner_21: 4689802046181751041
+      MiniMiner_22: -4449334604012867044
+      MiniMiner_23: 7624710627771013797
+      MiniMiner_24: -6382024054903591534
+      MiniMiner_25: -3345384105229966608
+      MiniMiner_26: 7810271840593514333
+      MiniMiner_27: -2821108715052025370
+      MiniMiner_28: 621621071900639970
+      MiniMiner_29: 2991204991595478225
+      MiniMiner_3: -7471119545488166273
+      MiniMiner_30: -2700326090504721114
+      MiniMiner_31: -7374651181111639442
+      MiniMiner_32: 1601069257459461721
+      MiniMiner_33: 6593452514077895410
+      MiniMiner_34: 1768014359865694305
+      MiniMiner_35: -5242934516945475688
+      MiniMiner_36: 4616073565756662652
+      MiniMiner_4: -8523917008254636229
+      MiniMiner_5: -5067960412559845778
+      MiniMiner_6: 4677811541557204712
+      MiniMiner_7: -6090859053213834154
+      MiniMiner_8: -6106452900040361282
+      MiniMiner_9: 2942471901544882865
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1010,7 +1010,42 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniMerchant_0: 4196239000010113515
+      MiniMerchant_1: 8314813314877677765
+      MiniMerchant_10: -1594262055072905426
+      MiniMerchant_11: -6772632617881933391
+      MiniMerchant_12: 49351488666786993
+      MiniMerchant_13: 4098878199091414441
+      MiniMerchant_14: -283612883405657897
+      MiniMerchant_15: -8435888662244036338
+      MiniMerchant_16: 8180555346275030282
+      MiniMerchant_17: 6675294133939046069
+      MiniMerchant_18: -2459974980048176611
+      MiniMerchant_19: -9132764973343152115
+      MiniMerchant_2: -6463173515625529458
+      MiniMerchant_20: 1540540918739199319
+      MiniMerchant_21: 1206462418172131641
+      MiniMerchant_22: -3030798096555085112
+      MiniMerchant_23: -9090206424400718794
+      MiniMerchant_24: 4037313924825888411
+      MiniMerchant_25: 3601015134065161540
+      MiniMerchant_26: -1584327895570516467
+      MiniMerchant_27: 8778409158786117555
+      MiniMerchant_28: 1058888827754400807
+      MiniMerchant_29: -787792664521117962
+      MiniMerchant_3: -5533754864678425507
+      MiniMerchant_30: -5240474570311348121
+      MiniMerchant_31: 4837332925850349988
+      MiniMerchant_32: 4329139395012350155
+      MiniMerchant_33: -5793879027153590454
+      MiniMerchant_34: 2272317588668199245
+      MiniMerchant_4: 3741546308274651435
+      MiniMerchant_5: 5904225794113610125
+      MiniMerchant_6: 5391426466025919202
+      MiniMerchant_7: -1553252132575916022
+      MiniMerchant_8: -8749162994266138888
+      MiniMerchant_9: 4457425173889173173
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

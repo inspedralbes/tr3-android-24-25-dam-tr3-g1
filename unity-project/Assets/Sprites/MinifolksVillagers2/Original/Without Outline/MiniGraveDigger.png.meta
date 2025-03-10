@@ -1335,7 +1335,55 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniGraveDigger_0: -3734716657676728536
+      MiniGraveDigger_1: 6257950410602895177
+      MiniGraveDigger_10: 6343232289178175211
+      MiniGraveDigger_11: -6871096481712739328
+      MiniGraveDigger_12: -5725633032697122907
+      MiniGraveDigger_13: -8969703486066557426
+      MiniGraveDigger_14: -6154603470885507661
+      MiniGraveDigger_15: -7618997355434471642
+      MiniGraveDigger_16: -3295303094559859537
+      MiniGraveDigger_17: -8968822841895493146
+      MiniGraveDigger_18: -2127571019427662849
+      MiniGraveDigger_19: -8788053865838410369
+      MiniGraveDigger_2: -5865111255768448139
+      MiniGraveDigger_20: -7112997740664935264
+      MiniGraveDigger_21: 9001429263794965871
+      MiniGraveDigger_22: 2726416620741391350
+      MiniGraveDigger_23: -8708782054347887628
+      MiniGraveDigger_24: 8604881033069034624
+      MiniGraveDigger_25: -2015143083060862809
+      MiniGraveDigger_26: 1518357557402960082
+      MiniGraveDigger_27: -766729681665986101
+      MiniGraveDigger_28: -1993568177353176616
+      MiniGraveDigger_29: -1312184933571862585
+      MiniGraveDigger_3: -8362696820570790334
+      MiniGraveDigger_30: 9199117469489609029
+      MiniGraveDigger_31: 3748841132284098572
+      MiniGraveDigger_32: -4146430177037945935
+      MiniGraveDigger_33: -7663829465458651086
+      MiniGraveDigger_34: -2127293676911574388
+      MiniGraveDigger_35: -4162986509899067525
+      MiniGraveDigger_36: 7532129140315206766
+      MiniGraveDigger_37: 363072443438967020
+      MiniGraveDigger_38: 8419829605170650651
+      MiniGraveDigger_39: 2455233736485744202
+      MiniGraveDigger_4: 6392632135389113729
+      MiniGraveDigger_40: 8478789890727541332
+      MiniGraveDigger_41: 7391572385231396135
+      MiniGraveDigger_42: -8712295180970159666
+      MiniGraveDigger_43: 8461858309870581928
+      MiniGraveDigger_44: 3612627169639876231
+      MiniGraveDigger_45: 8234340216755393040
+      MiniGraveDigger_46: 7398085291943705378
+      MiniGraveDigger_47: 4732247006028159319
+      MiniGraveDigger_5: -271282391032986878
+      MiniGraveDigger_6: 668830054236273231
+      MiniGraveDigger_7: -1966324435729725359
+      MiniGraveDigger_8: -8451819395101084882
+      MiniGraveDigger_9: 1516422102259972956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      screen_cap_2_0: -4996120806734992033
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

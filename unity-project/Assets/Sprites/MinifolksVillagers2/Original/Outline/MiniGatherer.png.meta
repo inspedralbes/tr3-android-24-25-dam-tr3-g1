@@ -960,7 +960,40 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniGatherer_0: -8189958837095307518
+      MiniGatherer_1: 2961170306987730539
+      MiniGatherer_10: -6380953633436102215
+      MiniGatherer_11: 2035655724975718440
+      MiniGatherer_12: -5652500151033354433
+      MiniGatherer_13: 1923263845236661065
+      MiniGatherer_14: 3079767893847567351
+      MiniGatherer_15: 6382158614427503206
+      MiniGatherer_16: -4309084076999148992
+      MiniGatherer_17: -3328882707275887014
+      MiniGatherer_18: 5238909510169475364
+      MiniGatherer_19: -6029636316678262526
+      MiniGatherer_2: 4289584290741713991
+      MiniGatherer_20: 2428107489138854171
+      MiniGatherer_21: -6024832284861596209
+      MiniGatherer_22: 6873236051018782677
+      MiniGatherer_23: 3471571410873600561
+      MiniGatherer_24: 7440374742775518675
+      MiniGatherer_25: -384959586430131810
+      MiniGatherer_26: 7713579060683896250
+      MiniGatherer_27: 8684135420328072086
+      MiniGatherer_28: 288553919514183842
+      MiniGatherer_29: -2949886225248383296
+      MiniGatherer_3: 1099692362123132462
+      MiniGatherer_30: 3248846405775239160
+      MiniGatherer_31: 8344463749169160407
+      MiniGatherer_32: -6589770299127112285
+      MiniGatherer_4: -6443029134308527393
+      MiniGatherer_5: -8632253317863371201
+      MiniGatherer_6: -1388505141714677614
+      MiniGatherer_7: -2572630277955513096
+      MiniGatherer_8: 7942108306752171393
+      MiniGatherer_9: -6135671352321001282
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

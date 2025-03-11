@@ -1,10 +1,8 @@
 using UnityEngine;
 
 public class Tile : MonoBehaviour
-
-[SerializedField] private int _highlight;
-
 {
+    [SerializeField] private GameObject _highlight;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,19 +12,22 @@ public class Tile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    void onMouseEnter()
+    void OnMouseEnter()
     {
         Debug.Log("Mouse entered tile.");
         _highlight.SetActive(true);
     }
 
-    void onMouseExit()
+    void OnMouseExit()
     {
         Debug.Log("Mouse exited tile.");
         _highlight.SetActive(false);
     }
-    
+    void OnMouseDown()
+    {
+        Debug.Log("Mouse clicked tile.");
+    }
 }

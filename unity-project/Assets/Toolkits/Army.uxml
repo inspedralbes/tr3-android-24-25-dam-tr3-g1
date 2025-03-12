@@ -4,4 +4,6 @@
     <engine:DropdownField label="Unit 2" class="foldout-bonic" />
     <engine:DropdownField label="Unit 3" class="foldout-bonic" />
     <engine:DropdownField label="Unit 4" class="foldout-bonic" />
+    <engine:Button text="Update" name="update" class="menu-button" />
+    <engine:Button text="Play" name="play" class="menu-button" />
 </engine:UXML>

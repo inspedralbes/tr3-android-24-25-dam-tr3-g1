@@ -19,3 +19,14 @@
     -unity-text-align: middle-center;
     align-self: flex-start;
 }
+
+.menu-button {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(70, 70, 70);
+    align-items: center;
+    top: 10%;
+    left: auto;
+    -unity-text-align: middle-center;
+    align-self: center;
+}

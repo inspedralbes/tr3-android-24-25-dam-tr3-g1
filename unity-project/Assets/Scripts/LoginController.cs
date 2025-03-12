@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Text;
+
 public class LoginController : MonoBehaviour
 {
     // Referències als elements UI Toolkit
@@ -66,9 +67,15 @@ public class LoginController : MonoBehaviour
                 string responseText = request.downloadHandler.text;
                 Debug.Log("Resposta del servidor: " + responseText);
 
+                // Deserialitza la resposta JSON a un objecte User
+                User user = JsonUtility.FromJson<User>(responseText);
+
                 // Comprova si la resposta conté l'usuari amb l'email introduït
-                if (responseText.Contains("\"email\":\"" + email + "\""))
+                if (user != null && user.email == email)
                 {
+                    // Desa la informació de l'usuari
+                    UserManager.Instance.SetUser(user);
+
                     SceneManager.LoadScene("MenuScene"); // Canvia a l'escena del menú
                 }
                 else

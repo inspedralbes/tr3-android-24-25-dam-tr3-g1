@@ -1,0 +1,9 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Army.uss?fileID=7433441132597879392&amp;guid=a2981254d0c9afc40a63440d004f1ebe&amp;type=3#Army" />
+    <engine:DropdownField label="Unit 1" class="foldout-bonic" />
+    <engine:DropdownField label="Unit 2" class="foldout-bonic" />
+    <engine:DropdownField label="Unit 3" class="foldout-bonic" />
+    <engine:DropdownField label="Unit 4" class="foldout-bonic" />
+    <engine:Button text="Update" name="update" class="menu-button" />
+    <engine:Button text="Play" name="play" class="menu-button" />
+</engine:UXML>

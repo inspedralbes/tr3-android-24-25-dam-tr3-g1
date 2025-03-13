@@ -1,0 +1,32 @@
+.foldout-bonic {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(255, 74, 68);
+    align-items: center;
+    top: 10%;
+    left: auto;
+    -unity-text-align: middle-center;
+    align-self: center;
+}
+
+.label-bonic {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(0, 0, 0);
+    align-items: center;
+    top: auto;
+    left: 20%;
+    -unity-text-align: middle-center;
+    align-self: flex-start;
+}
+
+.menu-button {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(70, 70, 70);
+    align-items: center;
+    top: 10%;
+    left: auto;
+    -unity-text-align: middle-center;
+    align-self: center;
+}

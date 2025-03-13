@@ -1,8 +1,8 @@
-using UnityEngine;
-using System;
 
+using System;
+using UnityEngine;
 [Serializable]
-public class Character
+public class Character:MonoBehaviour
 {
     public int id;
     public string name;
@@ -18,4 +18,10 @@ public class Character
     public int atk;
     public int movement;
     public int health;
+    public int actualHealth;
+    public int range;
+    public bool hasMoved=false;
+
+    public bool selected = false;
+
 }

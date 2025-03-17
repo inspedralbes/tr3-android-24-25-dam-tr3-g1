@@ -43,7 +43,23 @@ public class ArmyController : MonoBehaviour
             case 3: userArmy.unit4 = characterId; break;
         }
 
+        UpdateStatsLabels();
         Debug.Log($"Dropdown {index} changed to {dropdown.value} (ID: {characterId})");
+    }
+
+    private void UpdateStatsLabels()
+    {
+        var root = GetComponent<UIDocument>().rootVisualElement;
+        root.Q<Label>("unit1Stats").text = GetCharacterStats(userArmy.unit1);
+        root.Q<Label>("unit2Stats").text = GetCharacterStats(userArmy.unit2);
+        root.Q<Label>("unit3Stats").text = GetCharacterStats(userArmy.unit3);
+        root.Q<Label>("unit4Stats").text = GetCharacterStats(userArmy.unit4);
+    }
+
+    private string GetCharacterStats(int characterId)
+    {
+        var character = characters.Find(c => c.id == characterId);
+        return character != null ? $"Name: {character.name}, HP: {character.health}, Attack: {character.atk}" : "No character selected";
     }
 
     private IEnumerator FetchCharacters()
@@ -61,6 +77,7 @@ public class ArmyController : MonoBehaviour
             Debug.Log("Response: " + jsonResponse);
             CharacterList characterList = JsonUtility.FromJson<CharacterList>("{\"characters\":" + jsonResponse + "}");
             characters = characterList.characters;
+            Debug.Log("Characters: " + characterList);
             StartCoroutine(FetchUserArmy());
         }
     }

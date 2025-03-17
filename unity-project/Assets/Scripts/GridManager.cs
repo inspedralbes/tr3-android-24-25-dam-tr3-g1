@@ -94,7 +94,6 @@ public class GridManager : MonoBehaviour
             var tile = GameObject.Find($"Tile {x} {y}");
             if (tile != null)
             {
-                character.transform.SetParent(tile.transform);
                 tile.GetComponent<Tile>().Character = character;
                 tile.GetComponent<Tile>().CharacterData = characterData;
                 tile.GetComponent<Tile>().isOccupied = true;

@@ -1,0 +1,1053 @@
+fileFormatVersion: 2
+guid: 56d0cc1db65bd054486fcff917b1035c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4023056137937560639
+    second: tool_whip_0
+  - first:
+      213: 2252914046805811323
+    second: tool_whip_1
+  - first:
+      213: 4404776667863578536
+    second: tool_whip_2
+  - first:
+      213: 4819807975646229881
+    second: tool_whip_3
+  - first:
+      213: -1048853041518734914
+    second: tool_whip_4
+  - first:
+      213: 1345246973612769600
+    second: tool_whip_5
+  - first:
+      213: 4772401602723077790
+    second: tool_whip_6
+  - first:
+      213: -4255918107622925815
+    second: tool_whip_7
+  - first:
+      213: 8731285840468323995
+    second: tool_whip_8
+  - first:
+      213: -3107895318289133872
+    second: tool_whip_9
+  - first:
+      213: 7632134014788166380
+    second: tool_whip_10
+  - first:
+      213: -6141451010009515002
+    second: tool_whip_11
+  - first:
+      213: -7357406854799295120
+    second: tool_whip_12
+  - first:
+      213: 7948192391585923465
+    second: tool_whip_13
+  - first:
+      213: -4668777175553859766
+    second: tool_whip_14
+  - first:
+      213: -1884221264812449768
+    second: tool_whip_15
+  - first:
+      213: -2909249969531773113
+    second: tool_whip_16
+  - first:
+      213: 117638083261113005
+    second: tool_whip_17
+  - first:
+      213: -3607762010589814300
+    second: tool_whip_18
+  - first:
+      213: 6145460862830510815
+    second: tool_whip_19
+  - first:
+      213: -4742656682198845127
+    second: tool_whip_20
+  - first:
+      213: 526725422535804592
+    second: tool_whip_21
+  - first:
+      213: 1309624359639733210
+    second: tool_whip_22
+  - first:
+      213: 4496348494336723147
+    second: tool_whip_23
+  - first:
+      213: -7778441936174236149
+    second: tool_whip_24
+  - first:
+      213: 7577327407664324980
+    second: tool_whip_25
+  - first:
+      213: -543744996386164734
+    second: tool_whip_26
+  - first:
+      213: 7743504474136455035
+    second: tool_whip_27
+  - first:
+      213: -8442266213954152592
+    second: tool_whip_28
+  - first:
+      213: 2830123437350519905
+    second: tool_whip_29
+  - first:
+      213: -4559002403826473675
+    second: tool_whip_30
+  - first:
+      213: 5269490791937598957
+    second: tool_whip_31
+  - first:
+      213: 3053157353400646398
+    second: tool_whip_32
+  - first:
+      213: -6748924237666338777
+    second: tool_whip_33
+  - first:
+      213: 1585698539246080854
+    second: tool_whip_34
+  - first:
+      213: 4246535743738690876
+    second: tool_whip_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: tool_whip_0
+      rect:
+        serializedVersion: 2
+        x: 1409
+        y: 735
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f34293d0e34c4d730800000000000000
+      internalID: 4023056137937560639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_1
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 641
+        width: 49
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b70295d9365f34f10800000000000000
+      internalID: 2252914046805811323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_2
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 640
+        width: 40
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a7ffeaba09e02d30800000000000000
+      internalID: 4404776667863578536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_3
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 605
+        width: 52
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 975fcf141d563e240800000000000000
+      internalID: 4819807975646229881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_4
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 630
+        width: 62
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb110be37b9b171f0800000000000000
+      internalID: -1048853041518734914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_5
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 640
+        width: 44
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 041cb5dbef64ba210800000000000000
+      internalID: 1345246973612769600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_6
+      rect:
+        serializedVersion: 2
+        x: 1043
+        y: 640
+        width: 27
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9e50dfe8f9fa3240800000000000000
+      internalID: 4772401602723077790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_7
+      rect:
+        serializedVersion: 2
+        x: 1224
+        y: 640
+        width: 38
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90a9bf9a701ffe4c0800000000000000
+      internalID: -4255918107622925815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_8
+      rect:
+        serializedVersion: 2
+        x: 1405
+        y: 640
+        width: 50
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9e23892632cb2970800000000000000
+      internalID: 8731285840468323995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_9
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 449
+        width: 46
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dec642aca98ed4d0800000000000000
+      internalID: -3107895318289133872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 449
+        width: 56
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce2ef9d1379cae960800000000000000
+      internalID: 7632134014788166380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_11
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 449
+        width: 89
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60c3bee58de25caa0800000000000000
+      internalID: -6141451010009515002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_12
+      rect:
+        serializedVersion: 2
+        x: 635
+        y: 449
+        width: 79
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07df9af527d35e990800000000000000
+      internalID: -7357406854799295120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_13
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 449
+        width: 82
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98101fa6ed6ad4e60800000000000000
+      internalID: 7948192391585923465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_14
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 449
+        width: 102
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4f19a325eb253fb0800000000000000
+      internalID: -4668777175553859766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_15
+      rect:
+        serializedVersion: 2
+        x: 1159
+        y: 449
+        width: 103
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 810ed902eb6e9d5e0800000000000000
+      internalID: -1884221264812449768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_16
+      rect:
+        serializedVersion: 2
+        x: 1346
+        y: 463
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74f1e3b019440a7d0800000000000000
+      internalID: -2909249969531773113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_17
+      rect:
+        serializedVersion: 2
+        x: 1366
+        y: 449
+        width: 94
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da226d4a63fe1a100800000000000000
+      internalID: 117638083261113005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_18
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 257
+        width: 40
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e125ace097aeedc0800000000000000
+      internalID: -3607762010589814300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_19
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 249
+        width: 32
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd2041e3810194550800000000000000
+      internalID: 6145460862830510815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_20
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 257
+        width: 66
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 939b7ed00e2be2eb0800000000000000
+      internalID: -4742656682198845127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_21
+      rect:
+        serializedVersion: 2
+        x: 659
+        y: 257
+        width: 54
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b60a682bfd4f4700800000000000000
+      internalID: 526725422535804592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_22
+      rect:
+        serializedVersion: 2
+        x: 851
+        y: 254
+        width: 45
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad356899a68bc2210800000000000000
+      internalID: 1309624359639733210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_23
+      rect:
+        serializedVersion: 2
+        x: 1031
+        y: 248
+        width: 40
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc88d47022d366e30800000000000000
+      internalID: 4496348494336723147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_24
+      rect:
+        serializedVersion: 2
+        x: 1224
+        y: 218
+        width: 38
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0e3550654c6d0490800000000000000
+      internalID: -7778441936174236149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_25
+      rect:
+        serializedVersion: 2
+        x: 1410
+        y: 240
+        width: 44
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 471e9a08123182960800000000000000
+      internalID: 7577327407664324980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_26
+      rect:
+        serializedVersion: 2
+        x: 1410
+        y: 212
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 200b1028eca3478f0800000000000000
+      internalID: -543744996386164734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_27
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 65
+        width: 46
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b772d89da44767b60800000000000000
+      internalID: 7743504474136455035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_28
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 65
+        width: 56
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0771bf18b9b07da80800000000000000
+      internalID: -8442266213954152592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_29
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 65
+        width: 89
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16409c9854e964720800000000000000
+      internalID: 2830123437350519905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_30
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 65
+        width: 79
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53565c5e77b2bb0c0800000000000000
+      internalID: -4559002403826473675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_31
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 65
+        width: 82
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de5e1a0d4fdf02940800000000000000
+      internalID: 5269490791937598957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_32
+      rect:
+        serializedVersion: 2
+        x: 1042
+        y: 65
+        width: 102
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efa31d4cf6efe5a20800000000000000
+      internalID: 3053157353400646398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_33
+      rect:
+        serializedVersion: 2
+        x: 1234
+        y: 65
+        width: 103
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 728bfd5c9210752a0800000000000000
+      internalID: -6748924237666338777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_34
+      rect:
+        serializedVersion: 2
+        x: 1420
+        y: 65
+        width: 94
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6535e988b68810610800000000000000
+      internalID: 1585698539246080854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tool_whip_35
+      rect:
+        serializedVersion: 2
+        x: 1521
+        y: 79
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3d3b8382c9beea30800000000000000
+      internalID: 4246535743738690876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      tool_whip_0: 4023056137937560639
+      tool_whip_1: 2252914046805811323
+      tool_whip_10: 7632134014788166380
+      tool_whip_11: -6141451010009515002
+      tool_whip_12: -7357406854799295120
+      tool_whip_13: 7948192391585923465
+      tool_whip_14: -4668777175553859766
+      tool_whip_15: -1884221264812449768
+      tool_whip_16: -2909249969531773113
+      tool_whip_17: 117638083261113005
+      tool_whip_18: -3607762010589814300
+      tool_whip_19: 6145460862830510815
+      tool_whip_2: 4404776667863578536
+      tool_whip_20: -4742656682198845127
+      tool_whip_21: 526725422535804592
+      tool_whip_22: 1309624359639733210
+      tool_whip_23: 4496348494336723147
+      tool_whip_24: -7778441936174236149
+      tool_whip_25: 7577327407664324980
+      tool_whip_26: -543744996386164734
+      tool_whip_27: 7743504474136455035
+      tool_whip_28: -8442266213954152592
+      tool_whip_29: 2830123437350519905
+      tool_whip_3: 4819807975646229881
+      tool_whip_30: -4559002403826473675
+      tool_whip_31: 5269490791937598957
+      tool_whip_32: 3053157353400646398
+      tool_whip_33: -6748924237666338777
+      tool_whip_34: 1585698539246080854
+      tool_whip_35: 4246535743738690876
+      tool_whip_4: -1048853041518734914
+      tool_whip_5: 1345246973612769600
+      tool_whip_6: 4772401602723077790
+      tool_whip_7: -4255918107622925815
+      tool_whip_8: 8731285840468323995
+      tool_whip_9: -3107895318289133872
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -21,7 +21,6 @@ public class Character:MonoBehaviour
     public int actualHealth;
     public int range;
     public bool hasMoved=false;
-
     public bool selected = false;
 
 }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class Tile : MonoBehaviour
 {
     public int x, y;
+
+    public TurnManager turnManager;
     [SerializeField] private GameObject _highlight;
     private GameObject _character;
     private Character _characterData;
@@ -209,31 +211,33 @@ public class Tile : MonoBehaviour
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
 
-        Tile tileOriginMovement = findTileWithCharacterSelected();
-        if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
-        {
-            Debug.Log("The unit is on the tile x=" + tileOriginMovement.x + " y=" + tileOriginMovement.y);
-            moveUnit(tileOriginMovement, this);
-            return;
-        }
-
-        // Find all tiles and remove filters
-        Tile[] allTiles = FindObjectsOfType<Tile>();
-        foreach (Tile tile in allTiles)
-        {
-            if (tile.CharacterData != null)
+        if (UserManager.instance.currentUser == turnManager.GetCurrentPlayer()) {
+            Tile tileOriginMovement = findTileWithCharacterSelected();
+            if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
             {
-                tile.CharacterData.selected = false;
+                Debug.Log("The unit is on the tile x=" + tileOriginMovement.x + " y=" + tileOriginMovement.y);
+                moveUnit(tileOriginMovement, this);
+                return;
             }
-            RemoveFilters(tile);
-            tile.movable = false;
-            tile.attackable = false;
-        }
 
-        if (_character != null)
-        {
-            ApplyGrayscale();
-            showMovementRange(this, _characterData);
+            // Find all tiles and remove filters
+            Tile[] allTiles = FindObjectsOfType<Tile>();
+            foreach (Tile tile in allTiles)
+            {
+                if (tile.CharacterData != null)
+                {
+                    tile.CharacterData.selected = false;
+                }
+                RemoveFilters(tile);
+                tile.movable = false;
+                tile.attackable = false;
+            }
+
+            if (_character != null)
+            {
+                ApplyGrayscale();
+                showMovementRange(this, _characterData);
+            }
         }
     }
 
@@ -347,8 +351,8 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
-                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
+                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
+                    (turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)))
                 {
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
                     if (renderer != null)

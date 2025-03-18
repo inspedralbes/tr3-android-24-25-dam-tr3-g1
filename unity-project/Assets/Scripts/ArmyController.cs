@@ -75,9 +75,8 @@ public class ArmyController : MonoBehaviour
         {
             jsonResponse = request.downloadHandler.text;
             Debug.Log("Response: " + jsonResponse);
-            CharacterList characterList = JsonUtility.FromJson<CharacterList>("{\"characters\":" + jsonResponse + "}");
-            characters = characterList.characters;
-            Debug.Log("Characters: " + characterList);
+            characters = JsonUtility.FromJson<List<Character>>(jsonResponse);
+            Debug.Log("Characters: " + characters);
             StartCoroutine(FetchUserArmy());
         }
     }
@@ -171,6 +170,16 @@ public class ArmyController : MonoBehaviour
 
     private void OnPlayButtonClick()
     {
+        List<Character> army = new List<Character>();
+        foreach (var unitId in new int[] { userArmy.unit1, userArmy.unit2, userArmy.unit3, userArmy.unit4 })
+        {
+            var character = characters.Find(c => c.id == unitId);
+            if (character != null)
+            {
+                army.Add(character);
+            }
+        }
+        UserManager.Instance.CurrentUser.army = army;
         Debug.Log("Play button clicked");
         SceneManager.LoadScene("PlayScene");
     }

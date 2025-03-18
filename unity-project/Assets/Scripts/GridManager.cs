@@ -12,8 +12,7 @@ public class GridManager : MonoBehaviour
 
     private float _tileSize;
 
-    public List<Character> _army1;
-    public List<Character> _army2;
+    public TurnManager turnManager;
 
 
     void GenerateGrid()
@@ -42,6 +41,7 @@ public class GridManager : MonoBehaviour
                 spawnedTile.name = $"Tile {x} {y}";
                 spawnedTile.GetComponent<Tile>().x = x;
                 spawnedTile.GetComponent<Tile>().y = y;
+                spawnedTile.GetComponent<Tile>().turnManager = turnManager;
                 var spriteRenderer = spawnedTile.GetComponent<SpriteRenderer>();
                 if (spriteRenderer != null)
                 {
@@ -72,25 +72,42 @@ public class GridManager : MonoBehaviour
         if (_characterPrefab != null)
         {
             var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
-            character.name = $"Character {characterNumber}";
             var characterData = character.AddComponent<Character>();
-            characterData.id = characterNumber;
-            characterData.name = $"Character {characterNumber}";
-            characterData.weapon = "Sword";
-            characterData.vs_sword = 1.0f;
-            characterData.vs_spear = 1.0f;
-            characterData.vs_axe = 1.0f;
-            characterData.vs_bow = 1.0f;
-            characterData.vs_magic = 1.0f;
-            characterData.winged = false;
-            characterData.sprite = "character_sprite";
-            characterData.icon = "character_icon";
-            characterData.atk = 10;
-            characterData.movement = 4;
-            characterData.health = 100;
-            characterData.actualHealth = 100;
-            characterData.range = 1;
-            characterData.hasMoved = false;
+            characterData.id = armyManager[characterNumber].id;
+            characterData.name = armyManager[characterNumber].name;
+            characterData.weapon = armyManager[characterNumber].weapon;
+            characterData.vs_sword = armyManager[characterNumber].vs_sword;
+            characterData.vs_spear = armyManager[characterNumber].vs_spear;
+            characterData.vs_axe = armyManager[characterNumber].vs_axe;
+            characterData.vs_bow = armyManager[characterNumber].vs_bow;
+            characterData.vs_magic = armyManager[characterNumber].vs_magic;
+            characterData.winged = armyManager[characterNumber].winged;
+            characterData.sprite = armyManager[characterNumber].sprite;
+            characterData.icon = armyManager[characterNumber].icon;
+            characterData.atk = armyManager[characterNumber].atk;
+            characterData.movement = armyManager[characterNumber].movement;
+            characterData.health = armyManager[characterNumber].health;
+            characterData.actualHealth = armyManager[characterNumber].actualHealth;
+            characterData.range = armyManager[characterNumber].range;
+            characterData.hasMoved = armyManager[characterNumber].hasMoved;
+            characterData.selected = armyManager[characterNumber].selected;
+            // characterData.id = characterNumber;
+            // characterData.name = $"Character {characterNumber}";
+            // characterData.weapon = "Sword";
+            // characterData.vs_sword = 1.0f;
+            // characterData.vs_spear = 1.0f;
+            // characterData.vs_axe = 1.0f;
+            // characterData.vs_bow = 1.0f;
+            // characterData.vs_magic = 1.0f;
+            // characterData.winged = false;
+            // characterData.sprite = "character_sprite";
+            // characterData.icon = "character_icon";
+            // characterData.atk = 10;
+            // characterData.movement = 4;
+            // characterData.health = 100;
+            // characterData.actualHealth = 100;
+            // characterData.range = 1;
+            // characterData.hasMoved = false;
             var tile = GameObject.Find($"Tile {x} {y}");
             if (tile != null)
             {
@@ -98,7 +115,6 @@ public class GridManager : MonoBehaviour
                 tile.GetComponent<Tile>().CharacterData = characterData;
                 tile.GetComponent<Tile>().isOccupied = true;
                 Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
-                armyManager.Add(characterData);
             }
             else
             {
@@ -121,11 +137,11 @@ public class GridManager : MonoBehaviour
         {
             if (i < half / 2)
             {
-                StartCharacter(0, _height / 2 - 2 + i, i + 1, _army1);
+                StartCharacter(0, _height / 2 - 2 + i, i, turnManager.player1.army);
             }
             else
             {
-                StartCharacter(_width - 1, _height / 2 - 2 + (i - half / 2), i + 1, _army2);
+                StartCharacter(_width - 1, _height / 2 - 2 + (i - half / 2), i, turnManager.player2.army);
             }
         }
     }

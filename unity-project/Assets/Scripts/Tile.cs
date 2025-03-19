@@ -75,13 +75,13 @@ public class Tile : MonoBehaviour
         if (gridManager != null)
         {
             Character characterToMove = null;
-            if (gridManager._army1.Contains(tileOrigin.CharacterData))
+            if (turnManager.player1.army.Contains(tileOrigin.CharacterData))
             {
-                characterToMove = gridManager._army1.Find(c => c == tileOrigin.CharacterData);
+            characterToMove = turnManager.player1.army.Find(c => c == tileOrigin.CharacterData);
             }
-            else if (gridManager._army2.Contains(tileOrigin.CharacterData))
+            else if (turnManager.player2.army.Contains(tileOrigin.CharacterData))
             {
-                characterToMove = gridManager._army2.Find(c => c == tileOrigin.CharacterData);
+            characterToMove = turnManager.player2.army.Find(c => c == tileOrigin.CharacterData);
             }
             Debug.Log("Character to move: " + characterToMove.name);
             characterToMove.transform.SetParent(tileDestination.transform);
@@ -211,7 +211,7 @@ public class Tile : MonoBehaviour
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
 
-        if (UserManager.instance.currentUser == turnManager.GetCurrentPlayer()) {
+        if (UserManager.Instance.CurrentUser == turnManager.GetCurrentPlayer()) {
             Tile tileOriginMovement = findTileWithCharacterSelected();
             if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
             {
@@ -384,8 +384,8 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
-                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
+                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
+                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
                 {
                     // Same army, do not mark as attackable
                     tile.attackable = false;

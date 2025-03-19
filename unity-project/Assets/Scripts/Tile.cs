@@ -209,6 +209,20 @@ public class Tile : MonoBehaviour
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
 
+        GridManager gridManager = FindObjectOfType<GridManager>();
+        if (gridManager == null) return;
+
+        if (this.attackable && _characterData != null && !gridManager._army1.Contains(_characterData))
+        {
+            Attack();
+            return;
+        }
+        else if (_characterData != null && !gridManager._army1.Contains(_characterData))
+        {
+            Debug.Log("Cannot control characters from army2.");
+            return;
+        }
+
         Tile tileOriginMovement = findTileWithCharacterSelected();
         if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
         {
@@ -235,6 +249,44 @@ public class Tile : MonoBehaviour
             ApplyGrayscale();
             showMovementRange(this, _characterData);
         }
+    }
+    void Attack()
+    {
+        Debug.Log("Clicked on an attackable tile.");
+
+        // Encuentra la casilla de origen del personaje que ataca
+        Tile attackerTile = findTileWithCharacterSelected();
+        if (attackerTile == null) return;
+
+        // Encuentra la casilla más cercana vacía alrededor del objetivo
+        Tile closestTile = FindClosestMovableTile(attackerTile, this);
+        if (closestTile != null)
+        {
+            Debug.Log("Moving to closest attack position at: " + closestTile.x + ", " + closestTile.y);
+            moveUnit(attackerTile, closestTile);
+        }
+    }
+
+    // Método para encontrar la casilla más cercana al enemigo que sea alcanzable
+    Tile FindClosestMovableTile(Tile attackerTile, Tile targetTile)
+    {
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        Tile closestTile = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Tile tile in allTiles)
+        {
+            if (!tile.isOccupied && tile.movable) // Solo considerar tiles accesibles y vacías
+            {
+                float distance = Vector2.Distance(new Vector2(tile.x, tile.y), new Vector2(targetTile.x, targetTile.y));
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestTile = tile;
+                }
+            }
+        }
+        return closestTile;
     }
 
     void showMovementRange(Tile tile, Character _characterData)

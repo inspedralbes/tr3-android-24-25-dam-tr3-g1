@@ -5,36 +5,29 @@ using System.Collections.Generic;
 
 public class TurnManager : MonoBehaviour
 {
+    public static TurnManager Instance { get; private set; }
     public int currentPlayer = 1;
     public int turn = 1;
 
     public User player1 = new User(); 
     public User player2 = new User(); 
 
-    private void Start()
+    private void Awake()
     {
-        StartCoroutine(FetchUsersFromServer());
-    }
-
-    private IEnumerator FetchUsersFromServer()
-    {
-        UnityWebRequest request = UnityWebRequest.Get($"http://localhost:4000/getPlayingUsers/{UserManager.Instance.CurrentUser.id}");
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        if (Instance == null)
         {
-            Debug.LogError(request.error);
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            // Assuming the server returns a JSON array of two users
-            UserListWrapper userListWrapper = JsonUtility.FromJson<UserListWrapper>(request.downloadHandler.text);
-            if (userListWrapper.users.Count >= 2)
-            {
-                player1 = userListWrapper.users[0];
-                player2 = userListWrapper.users[1];
-            }
+            Destroy(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        
     }
 
     public void NextTurn()

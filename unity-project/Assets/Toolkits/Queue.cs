@@ -3,16 +3,16 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Login : EditorWindow
+public class Queue : EditorWindow
 {
     [SerializeField]
     private VisualTreeAsset m_VisualTreeAsset = default;
 
-    [MenuItem("Window/UI Toolkit/Login")]
+    [MenuItem("Window/UI Toolkit/Queue")]
     public static void ShowExample()
     {
-        Login wnd = GetWindow<Login>();
-        wnd.titleContent = new GUIContent("Login");
+        Queue wnd = GetWindow<Queue>();
+        wnd.titleContent = new GUIContent("Queue");
     }
 
     public void CreateGUI()

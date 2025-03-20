@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System.Collections.Generic;
 
 public class Tile : MonoBehaviour
@@ -222,10 +222,16 @@ public class Tile : MonoBehaviour
             Debug.Log("Cannot control characters from army2.");
             return;
         }
-
         Tile tileOriginMovement = findTileWithCharacterSelected();
         if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
         {
+            // Check if the destination tile is adjacent to the origin tile
+            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1)
+            {
+                Debug.Log("The destination tile is adjacent. No need to move.");
+                return;
+            }
+
             Debug.Log("The unit is on the tile x=" + tileOriginMovement.x + " y=" + tileOriginMovement.y);
             moveUnit(tileOriginMovement, this);
             return;
@@ -252,22 +258,84 @@ public class Tile : MonoBehaviour
     }
     void Attack()
     {
-        Debug.Log("Clicked on an attackable tile.");
+        Debug.Log("Attack action triggered!");
 
-        // Encuentra la casilla de origen del personaje que ataca
+        GridManager gridManager = FindObjectOfType<GridManager>();
+
         Tile attackerTile = findTileWithCharacterSelected();
-        if (attackerTile == null) return;
 
-        // Encuentra la casilla m·s cercana vacÌa alrededor del objetivo
+        // Verificar que el objetivo tiene un personaje
+        if (this.CharacterData == null)
+        {
+            Debug.LogWarning("‚ö†Ô∏è No enemy character found on the target tile.");
+            return;
+        }
+
+        // Verificar que el objetivo no es un aliado
+        if (gridManager._army1.Contains(this.CharacterData))
+        {
+            Debug.LogWarning("‚ö†Ô∏è Cannot attack an allied unit.");
+            return;
+        }
+
+        Debug.Log($"Attacker: {attackerTile.CharacterData.name} | Health: {attackerTile.CharacterData.actualHealth} | ATK: {attackerTile.CharacterData.atk}");
+        Debug.Log($"Defender: {this.CharacterData.name} | Health: {this.CharacterData.actualHealth} | ATK: {this.CharacterData.atk}");
+
+        int damage = attackerTile.CharacterData.atk;
+
+        if (attackerTile.CharacterData.weapon.Equals("SWORD"))
+        {
+            Debug.Log("Sword attack!");
+            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_sword);
+        }
+        else if (attackerTile.CharacterData.weapon.Equals("SPEAR"))
+        {
+            Debug.Log("Spear attack!");
+            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_spear);
+        }
+        else if (attackerTile.CharacterData.weapon.Equals("AXE"))
+        {
+            Debug.Log("Axe attack!");
+            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_axe);
+        }
+        else if (attackerTile.CharacterData.weapon.Equals("BOW"))
+        {
+            Debug.Log("Bow attack!");
+            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_bow);
+        }
+        else if (attackerTile.CharacterData.weapon.Equals("MAGIC"))
+        {
+            Debug.Log("Magic attack!");
+            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_magic);
+        }
+        else
+        {
+            Debug.Log("EE");
+            this.CharacterData.actualHealth -= damage;
+        }
+        Debug.Log($"{attackerTile.CharacterData.name} attacked {this.CharacterData.name} for {damage} damage. Remaining health: {this.CharacterData.actualHealth}");
+
         Tile closestTile = FindClosestMovableTile(attackerTile, this);
         if (closestTile != null)
         {
             Debug.Log("Moving to closest attack position at: " + closestTile.x + ", " + closestTile.y);
             moveUnit(attackerTile, closestTile);
         }
+
+        if (this.CharacterData.actualHealth <= 0)
+        {
+            Debug.Log($"{this.CharacterData.name} has been defeated!");
+
+            if (this.Character != null)
+            {
+                Destroy(this.Character);
+                this.Character = null;
+            }
+            this.CharacterData = null;
+            this.isOccupied = false;
+        }
     }
 
-    // MÈtodo para encontrar la casilla m·s cercana al enemigo que sea alcanzable
     Tile FindClosestMovableTile(Tile attackerTile, Tile targetTile)
     {
         Tile[] allTiles = FindObjectsOfType<Tile>();
@@ -276,7 +344,7 @@ public class Tile : MonoBehaviour
 
         foreach (Tile tile in allTiles)
         {
-            if (!tile.isOccupied && tile.movable) // Solo considerar tiles accesibles y vacÌas
+            if (!tile.isOccupied && tile.movable) // Solo considerar tiles accesibles y vac√≠as
             {
                 float distance = Vector2.Distance(new Vector2(tile.x, tile.y), new Vector2(targetTile.x, targetTile.y));
                 if (distance < minDistance)

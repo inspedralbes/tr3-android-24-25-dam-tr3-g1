@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public class Tile : MonoBehaviour
 {
@@ -225,7 +226,6 @@ public class Tile : MonoBehaviour
         Tile tileOriginMovement = findTileWithCharacterSelected();
         if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
         {
-            // Check if the destination tile is adjacent to the origin tile
             if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1)
             {
                 Debug.Log("The destination tile is adjacent. No need to move.");
@@ -237,7 +237,6 @@ public class Tile : MonoBehaviour
             return;
         }
 
-        // Find all tiles and remove filters
         Tile[] allTiles = FindObjectsOfType<Tile>();
         foreach (Tile tile in allTiles)
         {
@@ -264,7 +263,14 @@ public class Tile : MonoBehaviour
 
         Tile attackerTile = findTileWithCharacterSelected();
 
-        // Verificar que el objetivo tiene un personaje
+        // Validación del atacante
+        if (attackerTile == null || attackerTile.CharacterData == null)
+        {
+            Debug.LogWarning("⚠️ No attacking character found.");
+            return;
+        }
+
+        // Validación del objetivo
         if (this.CharacterData == null)
         {
             Debug.LogWarning("⚠️ No enemy character found on the target tile.");
@@ -283,49 +289,76 @@ public class Tile : MonoBehaviour
 
         int damage = attackerTile.CharacterData.atk;
 
-        if (attackerTile.CharacterData.weapon.Equals("SWORD"))
+        switch (attackerTile.CharacterData.weapon)
         {
-            Debug.Log("Sword attack!");
-            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_sword);
+            case "SWORD":
+                Debug.Log("Sword attack!");
+                damage = (int)(damage * this.CharacterData.vs_sword);
+                break;
+            case "SPEAR":
+                Debug.Log("Spear attack!");
+                damage = (int)(damage * this.CharacterData.vs_spear);
+                break;
+            case "AXE":
+                Debug.Log("Axe attack!");
+                damage = (int)(damage * this.CharacterData.vs_axe);
+                break;
+            case "BOW":
+                Debug.Log("Bow attack!");
+                damage = (int)(damage * this.CharacterData.vs_bow);
+                break;
+            case "MAGIC":
+                Debug.Log("Magic attack!");
+                damage = (int)(damage * this.CharacterData.vs_magic);
+                break;
+            default:
+                Debug.Log("Rocky mode");
+                break;
         }
-        else if (attackerTile.CharacterData.weapon.Equals("SPEAR"))
-        {
-            Debug.Log("Spear attack!");
-            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_spear);
-        }
-        else if (attackerTile.CharacterData.weapon.Equals("AXE"))
-        {
-            Debug.Log("Axe attack!");
-            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_axe);
-        }
-        else if (attackerTile.CharacterData.weapon.Equals("BOW"))
-        {
-            Debug.Log("Bow attack!");
-            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_bow);
-        }
-        else if (attackerTile.CharacterData.weapon.Equals("MAGIC"))
-        {
-            Debug.Log("Magic attack!");
-            this.CharacterData.actualHealth -= (int)(damage * this.CharacterData.vs_magic);
-        }
-        else
-        {
-            Debug.Log("EE");
-            this.CharacterData.actualHealth -= damage;
-        }
+
+        this.CharacterData.actualHealth -= damage;
         Debug.Log($"{attackerTile.CharacterData.name} attacked {this.CharacterData.name} for {damage} damage. Remaining health: {this.CharacterData.actualHealth}");
 
-        Tile closestTile = FindClosestMovableTile(attackerTile, this);
-        if (closestTile != null)
+        if (Mathf.Abs(attackerTile.x - this.x) > 1 || Mathf.Abs(attackerTile.y - this.y) > 1)
         {
-            Debug.Log("Moving to closest attack position at: " + closestTile.x + ", " + closestTile.y);
-            moveUnit(attackerTile, closestTile);
+            Tile closestTile = FindClosestMovableTile(attackerTile, this);
+            if (closestTile != null)
+            {
+                Debug.Log($"Moving to closest attack position at: {closestTile.x}, {closestTile.y}");
+                moveUnit(attackerTile, closestTile);
+            }
         }
+
+        if (attackerTile.Character != null)
+        {
+            Animator animator = attackerTile.Character.GetComponent<Animator>();
+            if (animator != null)
+            {
+                string attackDirection = "";
+                if (attackerTile.x < this.x)
+                    attackDirection = "IsAttackingRight";
+                else if (attackerTile.x > this.x)
+                    attackDirection = "IsAttackingLeft";
+                else if (attackerTile.y > this.y)
+                    attackDirection = "IsAttackingDown";
+                else
+                    attackDirection = "IsAttackingUp";
+
+                Debug.Log($"Attacking {attackDirection.Replace("IsAttacking", "").ToLower()}");
+                animator.SetBool(attackDirection, true);
+                StartCoroutine(ResetBoolAfterAnimation(animator, attackDirection));
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ Animator not found.");
+            }
+        }
+
+        attackerTile.CharacterData.selected = false;
 
         if (this.CharacterData.actualHealth <= 0)
         {
             Debug.Log($"{this.CharacterData.name} has been defeated!");
-
             if (this.Character != null)
             {
                 Destroy(this.Character);
@@ -334,6 +367,11 @@ public class Tile : MonoBehaviour
             this.CharacterData = null;
             this.isOccupied = false;
         }
+    }
+    IEnumerator ResetBoolAfterAnimation(Animator animator, string boolName)
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        animator.SetBool(boolName, false);
     }
 
     Tile FindClosestMovableTile(Tile attackerTile, Tile targetTile)
@@ -344,7 +382,7 @@ public class Tile : MonoBehaviour
 
         foreach (Tile tile in allTiles)
         {
-            if (!tile.isOccupied && tile.movable) // Solo considerar tiles accesibles y vacías
+            if (!tile.isOccupied && tile.movable)
             {
                 float distance = Vector2.Distance(new Vector2(tile.x, tile.y), new Vector2(targetTile.x, targetTile.y));
                 if (distance < minDistance)

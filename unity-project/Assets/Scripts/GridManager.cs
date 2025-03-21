@@ -69,68 +69,68 @@ public class GridManager : MonoBehaviour
 
     void StartCharacter(int x, int y, int characterNumber, List<Character> armyManager)
     {
-        if (_characterPrefab != null)
+        if (_characterPrefab == null)
         {
-            var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
-            var characterData = character.AddComponent<Character>();
-            characterData.id = armyManager[characterNumber].id;
-            characterData.name = armyManager[characterNumber].name;
-            characterData.weapon = armyManager[characterNumber].weapon;
-            characterData.vs_sword = armyManager[characterNumber].vs_sword;
-            characterData.vs_spear = armyManager[characterNumber].vs_spear;
-            characterData.vs_axe = armyManager[characterNumber].vs_axe;
-            characterData.vs_bow = armyManager[characterNumber].vs_bow;
-            characterData.vs_magic = armyManager[characterNumber].vs_magic;
-            characterData.winged = armyManager[characterNumber].winged;
-            characterData.sprite = armyManager[characterNumber].sprite;
-            characterData.icon = armyManager[characterNumber].icon;
-            characterData.atk = armyManager[characterNumber].atk;
-            characterData.movement = armyManager[characterNumber].movement;
-            characterData.health = armyManager[characterNumber].health;
-            characterData.actualHealth = armyManager[characterNumber].actualHealth;
-            characterData.range = armyManager[characterNumber].range;
-            characterData.hasMoved = armyManager[characterNumber].hasMoved;
-            characterData.selected = armyManager[characterNumber].selected;
-            // characterData.id = characterNumber;
-            // characterData.name = $"Character {characterNumber}";
-            // characterData.weapon = "Sword";
-            // characterData.vs_sword = 1.0f;
-            // characterData.vs_spear = 1.0f;
-            // characterData.vs_axe = 1.0f;
-            // characterData.vs_bow = 1.0f;
-            // characterData.vs_magic = 1.0f;
-            // characterData.winged = false;
-            // characterData.sprite = "character_sprite";
-            // characterData.icon = "character_icon";
-            // characterData.atk = 10;
-            // characterData.movement = 4;
-            // characterData.health = 100;
-            // characterData.actualHealth = 100;
-            // characterData.range = 1;
-            // characterData.hasMoved = false;
-            var tile = GameObject.Find($"Tile {x} {y}");
-            if (tile != null)
-            {
-                tile.GetComponent<Tile>().Character = character;
-                tile.GetComponent<Tile>().CharacterData = characterData;
-                tile.GetComponent<Tile>().isOccupied = true;
-                Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
-            }
-            else
-            {
-                Debug.LogWarning($"Tile {x} {y} not found.");
-            }
+            Debug.LogError("Character prefab is not assigned.");
+            return;
+        }
+
+        if (armyManager == null || characterNumber < 0 || characterNumber >= armyManager.Count)
+        {
+            Debug.Log("Army Manager: " + armyManager);
+            Debug.Log("Character Number: " + characterNumber);
+            Debug.LogError("Invalid army manager or character number.");
+            return;
+        }
+
+        var characterData = armyManager[characterNumber];
+        if (characterData == null)
+        {
+            Debug.LogError("Character data is null.");
+            return;
+        }
+
+        var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
+        var characterComponent = character.AddComponent<Character>();
+        characterComponent.id = characterData.id;
+        characterComponent.name = characterData.name;
+        characterComponent.weapon = characterData.weapon;
+        characterComponent.vs_sword = characterData.vs_sword;
+        characterComponent.vs_spear = characterData.vs_spear;
+        characterComponent.vs_axe = characterData.vs_axe;
+        characterComponent.vs_bow = characterData.vs_bow;
+        characterComponent.vs_magic = characterData.vs_magic;
+        characterComponent.winged = characterData.winged;
+        characterComponent.sprite = characterData.sprite;
+        characterComponent.icon = characterData.icon;
+        characterComponent.atk = characterData.atk;
+        characterComponent.movement = characterData.movement;
+        characterComponent.health = characterData.health;
+        characterComponent.actualHealth = characterData.actualHealth;
+        characterComponent.range = characterData.range;
+        characterComponent.hasMoved = characterData.hasMoved;
+        characterComponent.selected = characterData.selected;
+
+        var tile = GameObject.Find($"Tile {x} {y}");
+        if (tile != null)
+        {
+            var tileComponent = tile.GetComponent<Tile>();
+            tileComponent.Character = character;
+            tileComponent.CharacterData = characterComponent;
+            tileComponent.isOccupied = true;
+            Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
         }
         else
         {
-            Debug.LogWarning("Character prefab is not assigned.");
+            Debug.LogWarning($"Tile {x} {y} not found.");
         }
     }
 
     void Start()
     {
-   
-
+        turnManager = TurnManager.Instance;
+        Debug.Log("TurnManager: " + turnManager.player1.army);
+        Debug.Log("TurnManager: " + turnManager.player2.army);
         GenerateGrid();
         int half = (_height / 2 + 4) - (_height / 2 - 4);
         for (int i = 0; i < half; i++)

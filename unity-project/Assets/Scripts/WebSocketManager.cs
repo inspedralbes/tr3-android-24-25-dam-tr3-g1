@@ -3,6 +3,7 @@ using NativeWebSocket;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class WebSocketManager : MonoBehaviour
@@ -72,6 +73,13 @@ public class WebSocketManager : MonoBehaviour
         }
     }
 
+    [System.Serializable]
+    public class MatchFoundMessage
+    {
+        public string type;
+        public List<User> players;
+    }
+
     void ProcessMessage(byte[] data)
     {
         // Converteix les dades rebudes a una cadena de text
@@ -83,6 +91,15 @@ public class WebSocketManager : MonoBehaviour
         {
             Debug.Log("🎮 Partida trobada!");
             Debug.Log($"💬 {message}");
+            MatchFoundMessage matchFoundMessage = JsonUtility.FromJson<MatchFoundMessage>(message);
+            Debug.Log($"💬 {matchFoundMessage}");
+            if (matchFoundMessage != null && matchFoundMessage.players != null)
+            {
+                TurnManager.Instance.player1 = matchFoundMessage.players[0];
+                TurnManager.Instance.player2 = matchFoundMessage.players[1];
+            }
+            Debug.Log($"👤 Jugador 1: {TurnManager.Instance.player1}");
+            Debug.Log($"👤 Jugador 2: {TurnManager.Instance.player2}");
             SceneManager.LoadScene("PlayScene"); // Canvia a l'escena PlayScene
         }
         else if (message.Contains("\"opponentMove\""))

@@ -1,8 +1,7 @@
-
 using System;
 using UnityEngine;
 [Serializable]
-public class Character:MonoBehaviour
+public class Character : MonoBehaviour
 {
     public int id;
     public string name;

@@ -38,7 +38,7 @@ public class MenuController : MonoBehaviour
     // Canvia a l'escena OptionsScene
     void OnOptionsButtonClicked()
     {
-        SceneManager.LoadScene("OptionsScene");
+        SceneManager.LoadScene("ArmyScene");
     }
 
     // Tanca el joc

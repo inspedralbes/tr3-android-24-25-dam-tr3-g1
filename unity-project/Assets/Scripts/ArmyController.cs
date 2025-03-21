@@ -14,20 +14,22 @@ public class ArmyController : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(FetchCharacters());
+        
 
         var root = GetComponent<UIDocument>().rootVisualElement;
         var updateButton = root.Q<Button>("update");
         var playButton = root.Q<Button>("play");
         dropdowns = root.Query<DropdownField>().ToList();
 
-        updateButton.clicked += OnUpdateButtonClick;
-        playButton.clicked += OnPlayButtonClick;
-
         foreach (var dropdown in dropdowns)
         {
             dropdown.RegisterValueChangedCallback(evt => OnDropdownValueChanged(dropdown));
         }
+
+        updateButton.clicked += OnUpdateButtonClick;
+        playButton.clicked += OnPlayButtonClick;
+
+        StartCoroutine(FetchCharacters());
     }
 
     private void OnDropdownValueChanged(DropdownField dropdown)
@@ -75,17 +77,32 @@ public class ArmyController : MonoBehaviour
         {
             jsonResponse = request.downloadHandler.text;
             Debug.Log("Response: " + jsonResponse);
-            characters = JsonUtility.FromJson<List<Character>>(jsonResponse);
-            Debug.Log("Characters: " + characters);
+            
+            // Wrap the JSON array in an object
+            string wrappedJson = "{\"characters\":" + jsonResponse + "}";
+            Debug.Log("Wrapped JSON: " + wrappedJson);
+            CharacterList characterList = JsonUtility.FromJson<CharacterList>(wrappedJson);
+            //Character[] characterArray = JsonUtility.FromJson<Character[]>(wrappedJson);
+            Debug.Log("CharacterList: " + JsonUtility.ToJson(characterList));
+            //Debug.Log("CharacterArray: " + JsonUtility.ToJson(characterArray));
+            characters = characterList.characters;
+            Debug.Log("CharacterList: " + characterList.characters);
             StartCoroutine(FetchUserArmy());
         }
+    }
+    [System.Serializable]
+    public class CharacterList
+    {
+        public List<Character> characters;
     }
 
     private IEnumerator FetchUserArmy()
     {
-        int userId = 1;
+        int userId = UserManager.Instance.CurrentUser.id;
         UnityWebRequest request = UnityWebRequest.Get($"http://localhost:4000/armies/{userId}");
         yield return request.SendWebRequest();
+
+        Debug.Log(request.downloadHandler.text);
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
@@ -102,12 +119,23 @@ public class ArmyController : MonoBehaviour
 
     private void PopulateFoldouts()
     {
+        if (characters == null || userArmy == null)
+        {
+            Debug.LogError("Characters or userArmy is null");
+            return;
+        }
+
+        Debug.Log("Dropdowns: " + dropdowns);
+
+        Debug.Log("Characters: " + characters);
+        Debug.Log("User army: " + userArmy.unit1 + " " + userArmy.unit2 + " " + userArmy.unit3 + " " + userArmy.unit4);
         for (int i = 0; i < dropdowns.Count; i++)
         {
             dropdowns[i].choices.Clear();
-
+            Debug.Log("Character in JSON format: " + JsonUtility.ToJson(characters));
             foreach (var character in characters)
             {
+                Debug.Log("Adding character: " + character);
                 dropdowns[i].choices.Add(character.name);
             }
 
@@ -144,7 +172,7 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator UpdateArmy()
     {
-        int userId = 1;
+        int userId = UserManager.Instance.CurrentUser.id;
         string jsonData = JsonUtility.ToJson(userArmy);
         Debug.Log("Updating army: " + jsonData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
@@ -184,3 +212,4 @@ public class ArmyController : MonoBehaviour
         SceneManager.LoadScene("PlayScene");
     }
 }
+

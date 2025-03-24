@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using System;
 
 public class Tile : MonoBehaviour
 {
@@ -226,7 +227,7 @@ public class Tile : MonoBehaviour
         Tile tileOriginMovement = findTileWithCharacterSelected();
         if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
         {
-            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1)
+            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1 && this.attackable)
             {
                 Debug.Log("The destination tile is adjacent. No need to move.");
                 return;
@@ -326,20 +327,44 @@ public class Tile : MonoBehaviour
             {
                 Debug.Log($"Moving to closest attack position at: {closestTile.x}, {closestTile.y}");
                 moveUnit(attackerTile, closestTile);
+                attackerTile = findTileWithCharacterSelected();
+                StartCoroutine(AnimateAttackCoroutine(closestTile, this));
+                return;
             }
         }
 
+        AnimateAttack(attackerTile, this);
+    }
+
+    IEnumerator AnimateAttackCoroutine(Tile attackerTile, Tile targetTile)
+    {
+        Debug.Log("Waiting for movement to finish...");
+        while (attackerTile.Character.GetComponent<iTween>() != null)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1);
+        Debug.Log("Movement finished. Starting attack animation...");
+        AnimateAttack(attackerTile, targetTile);
+    }
+
+    void AnimateAttack(Tile attackerTile, Tile targetTile)
+    {
+        Debug.Log(JsonUtility.ToJson(attackerTile.CharacterData, true)); // Muestra toda la info del Tile
+        Debug.Log(JsonUtility.ToJson(targetTile.CharacterData, true)); // Muestra toda la info del personaje
+
         if (attackerTile.Character != null)
         {
-            Animator animator = attackerTile.Character.GetComponent<Animator>();
+            Debug.Log("Attacker animation");
+            Animator animator = attackerTile.CharacterData.GetComponent<Animator>();
             if (animator != null)
             {
                 string attackDirection = "";
-                if (attackerTile.x < this.x)
+                if (attackerTile.x < targetTile.x)
                     attackDirection = "IsAttackingRight";
-                else if (attackerTile.x > this.x)
+                else if (attackerTile.x > targetTile.x)
                     attackDirection = "IsAttackingLeft";
-                else if (attackerTile.y > this.y)
+                else if (attackerTile.y > targetTile.y)
                     attackDirection = "IsAttackingDown";
                 else
                     attackDirection = "IsAttackingUp";
@@ -354,18 +379,25 @@ public class Tile : MonoBehaviour
             }
         }
 
-        attackerTile.CharacterData.selected = false;
+            attackerTile.CharacterData.selected = false;
 
-        if (this.CharacterData.actualHealth <= 0)
+        if (targetTile.CharacterData.actualHealth <= 0)
         {
-            Debug.Log($"{this.CharacterData.name} has been defeated!");
-            if (this.Character != null)
+            Debug.Log($"{targetTile.CharacterData.name} has been defeated!");
+            if (targetTile.Character != null)
             {
-                Destroy(this.Character);
-                this.Character = null;
+                Destroy(targetTile.Character);
+                targetTile.Character = null;
             }
-            this.CharacterData = null;
-            this.isOccupied = false;
+            targetTile.CharacterData = null;
+            targetTile.isOccupied = false;
+        }
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        foreach (Tile tile in allTiles)
+        {
+            tile.movable = false;
+            tile.attackable = false;
+            RemoveFilters(tile);
         }
     }
     IEnumerator ResetBoolAfterAnimation(Animator animator, string boolName)
@@ -497,8 +529,9 @@ public class Tile : MonoBehaviour
             {
                 Material material = renderer.material;
                 material.color = Color.blue;
+                tile.movable = true;
+                tile.attackable = false;
             }
-            tile.movable = true;
         }
         else if (tile.Character != null)
         {
@@ -522,8 +555,8 @@ public class Tile : MonoBehaviour
                     {
                         Material material = renderer.material;
                         material.color = Color.red;
+                         tile.attackable = true;
                     }
-                    tile.attackable = true;
                 }
             }
         }

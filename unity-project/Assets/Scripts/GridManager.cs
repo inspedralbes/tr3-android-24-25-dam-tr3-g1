@@ -89,7 +89,7 @@ public class GridManager : MonoBehaviour
             characterData.movement = 4;
             characterData.health = 100;
             characterData.actualHealth = 100;
-            characterData.range = 1;
+            characterData.distance = 1;
             characterData.hasMoved = false;
             var tile = GameObject.Find($"Tile {x} {y}");
             if (tile != null)

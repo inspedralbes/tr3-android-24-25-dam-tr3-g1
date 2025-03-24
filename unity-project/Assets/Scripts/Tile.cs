@@ -437,7 +437,7 @@ public class Tile : MonoBehaviour
         if (_character != null)
         {
             int movement = _characterData.movement;
-            int range = _characterData.range;
+            int range = _characterData.distance;
             int x = tile.x;
             int y = tile.y;
             tile.movable = false;

@@ -71,58 +71,43 @@ public class GridManager : MonoBehaviour
     {
         if (_characterPrefab == null)
         {
-            Debug.LogError("Character prefab is not assigned.");
-            return;
-        }
-
-        if (armyManager == null || characterNumber < 0 || characterNumber >= armyManager.Count)
-        {
-            Debug.Log("Army Manager: " + armyManager);
-            Debug.Log("Character Number: " + characterNumber);
-            Debug.LogError("Invalid army manager or character number.");
-            return;
-        }
-
-        var characterData = armyManager[characterNumber];
-        if (characterData == null)
-        {
-            Debug.LogError("Character data is null.");
-            return;
-        }
-
-        var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
-        var characterComponent = character.AddComponent<Character>();
-        characterComponent.id = characterData.id;
-        characterComponent.name = characterData.name;
-        characterComponent.weapon = characterData.weapon;
-        characterComponent.vs_sword = characterData.vs_sword;
-        characterComponent.vs_spear = characterData.vs_spear;
-        characterComponent.vs_axe = characterData.vs_axe;
-        characterComponent.vs_bow = characterData.vs_bow;
-        characterComponent.vs_magic = characterData.vs_magic;
-        characterComponent.winged = characterData.winged;
-        characterComponent.sprite = characterData.sprite;
-        characterComponent.icon = characterData.icon;
-        characterComponent.atk = characterData.atk;
-        characterComponent.movement = characterData.movement;
-        characterComponent.health = characterData.health;
-        characterComponent.actualHealth = characterData.actualHealth;
-        characterComponent.range = characterData.range;
-        characterComponent.hasMoved = characterData.hasMoved;
-        characterComponent.selected = characterData.selected;
-
-        var tile = GameObject.Find($"Tile {x} {y}");
-        if (tile != null)
-        {
-            var tileComponent = tile.GetComponent<Tile>();
-            tileComponent.Character = character;
-            tileComponent.CharacterData = characterComponent;
-            tileComponent.isOccupied = true;
-            Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
+            var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
+            character.name = $"Character {characterNumber}";
+            var characterData = character.AddComponent<Character>();
+            characterData.id = characterNumber;
+            characterData.name = $"Character {characterNumber}";
+            characterData.weapon = "Sword";
+            characterData.vs_sword = 1.0f;
+            characterData.vs_spear = 1.0f;
+            characterData.vs_axe = 1.0f;
+            characterData.vs_bow = 1.0f;
+            characterData.vs_magic = 1.0f;
+            characterData.winged = false;
+            characterData.sprite = "character_sprite";
+            characterData.icon = "character_icon";
+            characterData.atk = 10;
+            characterData.movement = 4;
+            characterData.health = 100;
+            characterData.actualHealth = 100;
+            characterData.distance = 1;
+            characterData.hasMoved = false;
+            var tile = GameObject.Find($"Tile {x} {y}");
+            if (tile != null)
+            {
+                tile.GetComponent<Tile>().Character = character;
+                tile.GetComponent<Tile>().CharacterData = characterData;
+                tile.GetComponent<Tile>().isOccupied = true;
+                Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
+                armyManager.Add(characterData);
+            }
+            else
+            {
+                Debug.LogWarning($"Tile {x} {y} not found.");
+            }
         }
         else
         {
-            Debug.LogWarning($"Tile {x} {y} not found.");
+            Debug.LogWarning("Character prefab is not assigned.");
         }
     }
 

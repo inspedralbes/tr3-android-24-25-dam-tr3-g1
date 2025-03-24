@@ -4,6 +4,15 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using System.Linq;
+using Newtonsoft.Json;
+
+
+[System.Serializable]
+public class CharacterWrapper
+{
+    public Character[] characters;
+}
 
 public class ArmyController : MonoBehaviour
 {
@@ -11,6 +20,7 @@ public class ArmyController : MonoBehaviour
     private List<Character> characters;
     private LI_Army userArmy;
     private List<DropdownField> dropdowns;
+      int userId = 7;
 
     void Start()
     {
@@ -25,17 +35,25 @@ public class ArmyController : MonoBehaviour
         {
             dropdown.RegisterValueChangedCallback(evt => OnDropdownValueChanged(dropdown));
         }
-
-        updateButton.clicked += OnUpdateButtonClick;
-        playButton.clicked += OnPlayButtonClick;
-
-        StartCoroutine(FetchCharacters());
     }
 
+    private int findCharacterByName(string name)
+    {
+        foreach (var character in characters)
+        {
+            if (character.name == name)
+            {
+                return character.id;
+            }
+        }
+
+        return -1;
+    }
     private void OnDropdownValueChanged(DropdownField dropdown)
     {
         int index = dropdowns.IndexOf(dropdown);
-        int characterId = characters.Find(c => c.name == dropdown.value).id;
+        var characterId = findCharacterByName(dropdown.value);
+
 
         switch (index)
         {
@@ -66,27 +84,23 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator FetchCharacters()
     {
-        UnityWebRequest request = UnityWebRequest.Get("http://localhost:4000/characters");
+        UnityWebRequest request = UnityWebRequest.Get("http://localhost:4000/getCharactersOwned/7");
         yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError(request.error);
+        Debug.Log("Fetching characters");
+        Debug.Log(request.result);
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError){
+            var wrapper = JsonConvert.DeserializeObject<CharacterWrapper>("{\"characters\":" + jsonResponse + "}");
+            characters = new List<Character>(wrapper.characters);
         }
         else
         {
             jsonResponse = request.downloadHandler.text;
             Debug.Log("Response: " + jsonResponse);
-            
-            // Wrap the JSON array in an object
-            string wrappedJson = "{\"characters\":" + jsonResponse + "}";
-            Debug.Log("Wrapped JSON: " + wrappedJson);
-            CharacterList characterList = JsonUtility.FromJson<CharacterList>(wrappedJson);
-            //Character[] characterArray = JsonUtility.FromJson<Character[]>(wrappedJson);
-            Debug.Log("CharacterList: " + JsonUtility.ToJson(characterList));
-            //Debug.Log("CharacterArray: " + JsonUtility.ToJson(characterArray));
-            characters = characterList.characters;
-            Debug.Log("CharacterList: " + characterList.characters);
+            var wrapper = JsonConvert.DeserializeObject<CharacterWrapper>("{\"characters\":" + jsonResponse + "}");
+            characters = new List<Character>(wrapper.characters);
+            Debug.Log("Characters: " + characters);
+            Debug.Log(characters.Count);
+            Debug.Log(characters[0].name);
             StartCoroutine(FetchUserArmy());
         }
     }
@@ -98,7 +112,6 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator FetchUserArmy()
     {
-        int userId = UserManager.Instance.CurrentUser.id;
         UnityWebRequest request = UnityWebRequest.Get($"http://localhost:4000/armies/{userId}");
         yield return request.SendWebRequest();
 
@@ -111,7 +124,7 @@ public class ArmyController : MonoBehaviour
         else
         {
             jsonResponse = request.downloadHandler.text;
-            Debug.Log("Army Response: " + jsonResponse);
+            userArmy = JsonConvert.DeserializeObject<LI_Army>(jsonResponse);
             userArmy = JsonUtility.FromJson<LI_Army>(jsonResponse);
             PopulateFoldouts();
         }
@@ -119,23 +132,15 @@ public class ArmyController : MonoBehaviour
 
     private void PopulateFoldouts()
     {
-        if (characters == null || userArmy == null)
-        {
-            Debug.LogError("Characters or userArmy is null");
-            return;
-        }
-
-        Debug.Log("Dropdowns: " + dropdowns);
-
-        Debug.Log("Characters: " + characters);
-        Debug.Log("User army: " + userArmy.unit1 + " " + userArmy.unit2 + " " + userArmy.unit3 + " " + userArmy.unit4);
+        Debug.Log("Populating foldouts");
+        Debug.Log(dropdowns.Count);
         for (int i = 0; i < dropdowns.Count; i++)
         {
             dropdowns[i].choices.Clear();
-            Debug.Log("Character in JSON format: " + JsonUtility.ToJson(characters));
+            Debug.Log("Populating foldout " + i);
             foreach (var character in characters)
             {
-                Debug.Log("Adding character: " + character);
+                Debug.Log($"Adding character: Name: {character.name}, ID: {character.id}, HP: {character.health}, Attack: {character.atk}");
                 dropdowns[i].choices.Add(character.name);
             }
 
@@ -160,6 +165,7 @@ public class ArmyController : MonoBehaviour
 
     private string GetCharacterNameById(int id)
     {
+        Debug.Log("Getting character name by ID: " + id);
         var character = characters.Find(c => c.id == id);
         return character != null ? character.name : string.Empty;
     }
@@ -172,8 +178,7 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator UpdateArmy()
     {
-        int userId = UserManager.Instance.CurrentUser.id;
-        string jsonData = JsonUtility.ToJson(userArmy);
+        string jsonData = JsonConvert.SerializeObject(userArmy);
         Debug.Log("Updating army: " + jsonData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
 

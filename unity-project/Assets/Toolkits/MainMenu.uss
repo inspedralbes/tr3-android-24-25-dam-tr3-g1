@@ -1,21 +1,58 @@
+@font-face {
+    font-family: 'ThaleahPixelFont';
+    src: url('Assets/Thaleah_PixelFont/ThaleahFat.ttf');
+}
+
+.background {
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    height: 80%; /* Set height to 80% */
+    flex-grow: 1;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center the content vertically */
+    overflow: auto;
+    box-sizing: border-box;
+    margin-top: 50px; /* Add margin to avoid covering the title */
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .title {
+    font-family: 'ThaleahPixelFont';
     font-size: 30px;
     -unity-font-style: bold;
     color: rgb(255, 74, 68);
     align-items: center;
-    top: 10%;
-    left: auto;
-    -unity-text-align: middle-center;
+    margin-top: 10%;
+    text-align: center;
     align-self: center;
 }
 
 .menu-button {
-    font-size: 30px;
+    font-family: 'ThaleahPixelFont';
+    background-color: rgb(68, 138, 255);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
     -unity-font-style: bold;
-    color: rgb(70, 70, 70);
-    align-items: center;
-    top: 10%;
-    left: auto;
-    -unity-text-align: middle-center;
-    align-self: center;
+    width: 200px; /* Set a fixed width for all buttons */
+    text-align: center;
+}
+
+.menu-button:hover {
+    font-family: 'ThaleahPixelFont';
+    background-color: rgb(115, 159, 236);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    width: 200px; /* Ensure hover state has the same width */
+    text-align: center;
 }

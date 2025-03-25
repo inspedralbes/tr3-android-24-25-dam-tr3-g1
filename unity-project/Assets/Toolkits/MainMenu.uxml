@@ -1,7 +1,10 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Toolkits/Login.uss?fileID=7433441132597879392&amp;guid=90c8ae96511798d4fabdc8694c5eb1a6&amp;type=3#Login" />
-    <engine:Label text="Lorem ipsum" class="custom-label title" style="text-overflow: clip; -unity-text-align: upper-center; height: 78px; width: 167px; white-space: pre-wrap; color: rgb(255, 0, 33); -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=4dc0d493d24ffe14d8168e51208ba1aa&amp;type=3#NotInter-Regular&quot;);" />
-    <engine:Button text="Jugar" name="play" class="menu-button" style="width: 143px; height: 45px;" />
-    <engine:Button text="Opcions" name="options" class="menu-button" style="width: 143px; height: 45px;" />
-    <engine:Button text="Sortir" name="logout" class="menu-button" style="width: 143px; height: 47px;" />
+    <Style src="project://database/Assets/Toolkits/MainMenu.uss?fileID=7433441132597879392&amp;guid=90c8ae96511798d4fabdc8694c5eb1a6&amp;type=3#MainMenu" />
+    <engine:VisualElement name="bakcground" class="background" style="flex-grow: 1;">
+        <engine:Label text="Lord of the Grids" name="Label" class="custom-label title" style="text-overflow: clip; -unity-text-align: upper-center; height: 78px; width: 167px; white-space: pre-wrap; color: rgb(255, 0, 33); -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=4dc0d493d24ffe14d8168e51208ba1aa&amp;type=3#NotInter-Regular&quot;);" />
+        <engine:Button text="Jugar" name="play" class="menu-button" style="width: 143px; height: 45px;" />
+        <engine:Button text="Exercit" name="options" class="menu-button" style="width: 143px; height: 45px;" />
+        <engine:Button text="Botiga" name="Botiga" class="menu-button" style="width: 144px;" />
+        <engine:Button text="Sortir" name="logout" class="menu-button" style="width: 143px; height: 47px;" />
+    </engine:VisualElement>
 </engine:UXML>

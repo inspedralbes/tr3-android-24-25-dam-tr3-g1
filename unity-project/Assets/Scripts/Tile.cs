@@ -288,7 +288,7 @@ public class Tile : MonoBehaviour
         Debug.Log($"Attacker: {attackerTile.CharacterData.name} | Health: {attackerTile.CharacterData.actualHealth} | ATK: {attackerTile.CharacterData.atk}");
         Debug.Log($"Defender: {this.CharacterData.name} | Health: {this.CharacterData.actualHealth} | ATK: {this.CharacterData.atk}");
 
-        int damage = attackerTile.CharacterData.atk;
+        int damage = (int)attackerTile.CharacterData.atk;
 
         switch (attackerTile.CharacterData.weapon)
         {

@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using System;
 
 public class Tile : MonoBehaviour
 {
     public int x, y;
-
-    public TurnManager turnManager;
     [SerializeField] private GameObject _highlight;
     private GameObject _character;
     private Character _characterData;
@@ -75,13 +75,13 @@ public class Tile : MonoBehaviour
         if (gridManager != null)
         {
             Character characterToMove = null;
-            if (turnManager.player1.army.Contains(tileOrigin.CharacterData))
+            if (gridManager._army1.Contains(tileOrigin.CharacterData))
             {
-            characterToMove = turnManager.player1.army.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = gridManager._army1.Find(c => c == tileOrigin.CharacterData);
             }
-            else if (turnManager.player2.army.Contains(tileOrigin.CharacterData))
+            else if (gridManager._army2.Contains(tileOrigin.CharacterData))
             {
-            characterToMove = turnManager.player2.army.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = gridManager._army2.Find(c => c == tileOrigin.CharacterData);
             }
             Debug.Log("Character to move: " + characterToMove.name);
             characterToMove.transform.SetParent(tileDestination.transform);
@@ -211,34 +211,220 @@ public class Tile : MonoBehaviour
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
 
-        if (UserManager.Instance.CurrentUser == turnManager.GetCurrentPlayer()) {
-            Tile tileOriginMovement = findTileWithCharacterSelected();
-            if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
+        GridManager gridManager = FindObjectOfType<GridManager>();
+        if (gridManager == null) return;
+
+        if (this.attackable && _characterData != null && !gridManager._army1.Contains(_characterData))
+        {
+            Attack();
+            return;
+        }
+        else if (_characterData != null && !gridManager._army1.Contains(_characterData))
+        {
+            Debug.Log("Cannot control characters from army2.");
+            return;
+        }
+        Tile tileOriginMovement = findTileWithCharacterSelected();
+        if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
+        {
+            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1 && this.attackable)
             {
-                Debug.Log("The unit is on the tile x=" + tileOriginMovement.x + " y=" + tileOriginMovement.y);
-                moveUnit(tileOriginMovement, this);
+                Debug.Log("The destination tile is adjacent. No need to move.");
                 return;
             }
 
-            // Find all tiles and remove filters
-            Tile[] allTiles = FindObjectsOfType<Tile>();
-            foreach (Tile tile in allTiles)
-            {
-                if (tile.CharacterData != null)
-                {
-                    tile.CharacterData.selected = false;
-                }
-                RemoveFilters(tile);
-                tile.movable = false;
-                tile.attackable = false;
-            }
+            Debug.Log("The unit is on the tile x=" + tileOriginMovement.x + " y=" + tileOriginMovement.y);
+            moveUnit(tileOriginMovement, this);
+            return;
+        }
 
-            if (_character != null)
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        foreach (Tile tile in allTiles)
+        {
+            if (tile.CharacterData != null)
             {
-                ApplyGrayscale();
-                showMovementRange(this, _characterData);
+                tile.CharacterData.selected = false;
+            }
+            RemoveFilters(tile);
+            tile.movable = false;
+            tile.attackable = false;
+        }
+
+        if (_character != null)
+        {
+            ApplyGrayscale();
+            showMovementRange(this, _characterData);
+        }
+    }
+    void Attack()
+    {
+        Debug.Log("Attack action triggered!");
+
+        GridManager gridManager = FindObjectOfType<GridManager>();
+
+        Tile attackerTile = findTileWithCharacterSelected();
+
+        // Validación del atacante
+        if (attackerTile == null || attackerTile.CharacterData == null)
+        {
+            Debug.LogWarning("⚠️ No attacking character found.");
+            return;
+        }
+
+        // Validación del objetivo
+        if (this.CharacterData == null)
+        {
+            Debug.LogWarning("⚠️ No enemy character found on the target tile.");
+            return;
+        }
+
+        // Verificar que el objetivo no es un aliado
+        if (gridManager._army1.Contains(this.CharacterData))
+        {
+            Debug.LogWarning("⚠️ Cannot attack an allied unit.");
+            return;
+        }
+
+        Debug.Log($"Attacker: {attackerTile.CharacterData.name} | Health: {attackerTile.CharacterData.actualHealth} | ATK: {attackerTile.CharacterData.atk}");
+        Debug.Log($"Defender: {this.CharacterData.name} | Health: {this.CharacterData.actualHealth} | ATK: {this.CharacterData.atk}");
+
+        int damage = attackerTile.CharacterData.atk;
+
+        switch (attackerTile.CharacterData.weapon)
+        {
+            case "SWORD":
+                Debug.Log("Sword attack!");
+                damage = (int)(damage * this.CharacterData.vs_sword);
+                break;
+            case "SPEAR":
+                Debug.Log("Spear attack!");
+                damage = (int)(damage * this.CharacterData.vs_spear);
+                break;
+            case "AXE":
+                Debug.Log("Axe attack!");
+                damage = (int)(damage * this.CharacterData.vs_axe);
+                break;
+            case "BOW":
+                Debug.Log("Bow attack!");
+                damage = (int)(damage * this.CharacterData.vs_bow);
+                break;
+            case "MAGIC":
+                Debug.Log("Magic attack!");
+                damage = (int)(damage * this.CharacterData.vs_magic);
+                break;
+            default:
+                Debug.Log("Rocky mode");
+                break;
+        }
+
+        this.CharacterData.actualHealth -= damage;
+        Debug.Log($"{attackerTile.CharacterData.name} attacked {this.CharacterData.name} for {damage} damage. Remaining health: {this.CharacterData.actualHealth}");
+
+        if (Mathf.Abs(attackerTile.x - this.x) > 1 || Mathf.Abs(attackerTile.y - this.y) > 1)
+        {
+            Tile closestTile = FindClosestMovableTile(attackerTile, this);
+            if (closestTile != null)
+            {
+                Debug.Log($"Moving to closest attack position at: {closestTile.x}, {closestTile.y}");
+                moveUnit(attackerTile, closestTile);
+                attackerTile = findTileWithCharacterSelected();
+                StartCoroutine(AnimateAttackCoroutine(closestTile, this));
+                return;
             }
         }
+
+        AnimateAttack(attackerTile, this);
+    }
+
+    IEnumerator AnimateAttackCoroutine(Tile attackerTile, Tile targetTile)
+    {
+        Debug.Log("Waiting for movement to finish...");
+        while (attackerTile.Character.GetComponent<iTween>() != null)
+        {
+            yield return null;
+        }
+        yield return new WaitForSeconds(1);
+        Debug.Log("Movement finished. Starting attack animation...");
+        AnimateAttack(attackerTile, targetTile);
+    }
+
+    void AnimateAttack(Tile attackerTile, Tile targetTile)
+    {
+        Debug.Log(JsonUtility.ToJson(attackerTile.CharacterData, true)); // Muestra toda la info del Tile
+        Debug.Log(JsonUtility.ToJson(targetTile.CharacterData, true)); // Muestra toda la info del personaje
+
+        if (attackerTile.Character != null)
+        {
+            Debug.Log("Attacker animation");
+            Animator animator = attackerTile.CharacterData.GetComponent<Animator>();
+            if (animator != null)
+            {
+                string attackDirection = "";
+                if (attackerTile.x < targetTile.x)
+                    attackDirection = "IsAttackingRight";
+                else if (attackerTile.x > targetTile.x)
+                    attackDirection = "IsAttackingLeft";
+                else if (attackerTile.y > targetTile.y)
+                    attackDirection = "IsAttackingDown";
+                else
+                    attackDirection = "IsAttackingUp";
+
+                Debug.Log($"Attacking {attackDirection.Replace("IsAttacking", "").ToLower()}");
+                animator.SetBool(attackDirection, true);
+                StartCoroutine(ResetBoolAfterAnimation(animator, attackDirection));
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ Animator not found.");
+            }
+        }
+
+            attackerTile.CharacterData.selected = false;
+
+        if (targetTile.CharacterData.actualHealth <= 0)
+        {
+            Debug.Log($"{targetTile.CharacterData.name} has been defeated!");
+            if (targetTile.Character != null)
+            {
+                Destroy(targetTile.Character);
+                targetTile.Character = null;
+            }
+            targetTile.CharacterData = null;
+            targetTile.isOccupied = false;
+        }
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        foreach (Tile tile in allTiles)
+        {
+            tile.movable = false;
+            tile.attackable = false;
+            RemoveFilters(tile);
+        }
+    }
+    IEnumerator ResetBoolAfterAnimation(Animator animator, string boolName)
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        animator.SetBool(boolName, false);
+    }
+
+    Tile FindClosestMovableTile(Tile attackerTile, Tile targetTile)
+    {
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        Tile closestTile = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Tile tile in allTiles)
+        {
+            if (!tile.isOccupied && tile.movable)
+            {
+                float distance = Vector2.Distance(new Vector2(tile.x, tile.y), new Vector2(targetTile.x, targetTile.y));
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestTile = tile;
+                }
+            }
+        }
+        return closestTile;
     }
 
     void showMovementRange(Tile tile, Character _characterData)
@@ -343,16 +529,17 @@ public class Tile : MonoBehaviour
             {
                 Material material = renderer.material;
                 material.color = Color.blue;
+                tile.movable = true;
+                tile.attackable = false;
             }
-            tile.movable = true;
         }
         else if (tile.Character != null)
         {
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
-                    (turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)))
+                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
+                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
                 {
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
                     if (renderer != null)
@@ -368,8 +555,8 @@ public class Tile : MonoBehaviour
                     {
                         Material material = renderer.material;
                         material.color = Color.red;
+                         tile.attackable = true;
                     }
-                    tile.attackable = true;
                 }
             }
         }
@@ -384,8 +571,8 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
-                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
+                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
+                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
                 {
                     // Same army, do not mark as attackable
                     tile.attackable = false;

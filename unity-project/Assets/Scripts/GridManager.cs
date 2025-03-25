@@ -76,8 +76,8 @@ public class GridManager : MonoBehaviour
             var characterData = character.AddComponent<Character>();
             characterData.id = characterNumber;
             characterData.name = $"Character {characterNumber}";
-            characterData.weapon = "Sword";
-            characterData.vs_sword = 1.0f;
+            characterData.weapon = "SWORD";
+            characterData.vs_sword = 0.4f;
             characterData.vs_spear = 1.0f;
             characterData.vs_axe = 1.0f;
             characterData.vs_bow = 1.0f;

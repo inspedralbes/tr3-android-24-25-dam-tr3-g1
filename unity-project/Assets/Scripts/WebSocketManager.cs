@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Newtonsoft.Json; // Add this line
 
 public class WebSocketManager : MonoBehaviour
 {
     public static WebSocketManager Instance { get; private set; }
     private WebSocket websocket;
     private string serverUrl = "ws://localhost:4000";
+    private string currentRoom; // Field to store the current room
 
     private void Awake()
     {
@@ -43,6 +45,7 @@ public class WebSocketManager : MonoBehaviour
         // Connecta al servidor WebSocket i uneix l'usuari a la cua
         await websocket.Connect();
     }
+
     void Update()
     {
     #if !UNITY_WEBGL || UNITY_EDITOR
@@ -57,10 +60,10 @@ public class WebSocketManager : MonoBehaviour
         await SendMessage(message);
     }
 
-    public async Task SendMove(string move, string room)
+    public async Task SendMove(string move)
     {
         // Crea un missatge JSON per enviar un moviment i l'envia
-        string message = $"{{\"type\": \"makeMove\", \"room\": \"{room}\", \"move\": \"{move}\"}}";
+        string message = $"{{\"type\": \"makeMove\", \"room\": \"{currentRoom}\", \"move\": \"{move}\"}}";
         await SendMessage(message);
     }
 
@@ -77,34 +80,54 @@ public class WebSocketManager : MonoBehaviour
     public class MatchFoundMessage
     {
         public string type;
+        public string room;
         public List<User> players;
+        public List<List<CharacterData>> armies;
     }
 
     void ProcessMessage(byte[] data)
     {
-        // Converteix les dades rebudes a una cadena de text
+        // Convert the received data to a string
         string message = Encoding.UTF8.GetString(data);
         Debug.Log($"📩 Rebut: {message}");
 
-        // Processa el missatge rebut
+        // Process the received message
         if (message.Contains("\"matchFound\""))
         {
             Debug.Log("🎮 Partida trobada!");
             Debug.Log($"💬 {message}");
-            MatchFoundMessage matchFoundMessage = JsonUtility.FromJson<MatchFoundMessage>(message);
+            MatchFoundMessage matchFoundMessage = JsonConvert.DeserializeObject<MatchFoundMessage>(message);
             Debug.Log($"💬 {matchFoundMessage}");
             if (matchFoundMessage != null && matchFoundMessage.players != null)
             {
                 TurnManager.Instance.player1 = matchFoundMessage.players[0];
                 TurnManager.Instance.player2 = matchFoundMessage.players[1];
+                TurnManager.Instance.player1.army = matchFoundMessage.armies[0].ConvertAll(data => ConvertToCharacter(data)); 
+                TurnManager.Instance.player2.army = matchFoundMessage.armies[1].ConvertAll(data => ConvertToCharacter(data)); 
+                currentRoom = matchFoundMessage.room; 
+
+                // Debug logs to verify the armies
+                Debug.Log($"Player 1 Army: {JsonConvert.SerializeObject(TurnManager.Instance.player1.army, Formatting.Indented)}");
+                Debug.Log($"Player 2 Army: {JsonConvert.SerializeObject(TurnManager.Instance.player2.army, Formatting.Indented)}");
             }
-            Debug.Log($"👤 Jugador 1: {TurnManager.Instance.player1}");
-            Debug.Log($"👤 Jugador 2: {TurnManager.Instance.player2}");
-            SceneManager.LoadScene("PlayScene"); // Canvia a l'escena PlayScene
+            Debug.Log($"👤 Jugador 1: {TurnManager.Instance.player1.ToString()}");
+            Debug.Log($"👤 Jugador 2: {TurnManager.Instance.player2.ToString()}");
+
+            SceneManager.LoadScene("PlayScene");
         }
         else if (message.Contains("\"opponentMove\""))
         {
             Debug.Log("🏹 L'oponent ha fet un moviment!");
+            var moveData = JsonConvert.DeserializeObject<MoveData>(message);
+            if (moveData != null)
+            {
+                Tile tileOrigin = FindTile(moveData.origin.x, moveData.origin.y);
+                Tile tileDestination = FindTile(moveData.destination.x, moveData.destination.y);
+                if (tileOrigin != null && tileDestination != null)
+                {
+                    tileOrigin.moveUnit(tileOrigin, tileDestination);
+                }
+            }
         }
         else if (message.Contains("\"gameOver\""))
         {
@@ -124,5 +147,57 @@ public class WebSocketManager : MonoBehaviour
         {
             await websocket.Close();
         }
+    }
+
+    private Tile FindTile(int x, int y)
+    {
+        Tile[] allTiles = FindObjectsOfType<Tile>();
+        foreach (Tile tile in allTiles)
+        {
+            if (tile.x == x && tile.y == y)
+            {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    private Character ConvertToCharacter(CharacterData data)
+    {
+        // Create a new Character instance and copy the data from CharacterData
+        Character character = new GameObject().AddComponent<Character>();
+        character.id = data.id;
+        character.name = data.name;
+        character.weapon = data.weapon;
+        character.vs_sword = data.vs_sword;
+        character.vs_spear = data.vs_spear;
+        character.vs_axe = data.vs_axe;
+        character.vs_bow = data.vs_bow;
+        character.vs_magic = data.vs_magic;
+        character.distance = data.distance;
+        character.winged = data.winged;
+        character.sprite = data.sprite;
+        character.icon = data.icon;
+        character.atk = data.atk;
+        character.movement = data.movement;
+        character.health = data.health;
+        character.actualHealth = data.actualHealth;
+        character.price = data.price;
+        character.hasMoved = data.hasMoved;
+        character.selected = data.selected;
+        return character;
+    }
+
+    public class MoveData
+    {
+        public Position origin { get; set; }
+        public Position destination { get; set; }
+        public int userId { get; set; }
+    }
+
+    public class Position
+    {
+        public int x { get; set; }
+        public int y { get; set; }
     }
 }

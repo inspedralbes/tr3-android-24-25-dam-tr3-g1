@@ -12,4 +12,10 @@ public class User
     public int elo;
     public int victories;
     public int defeats;
+
+    public override string ToString()
+    {
+        string armyString = string.Join(", ", army);
+        return $"User: {username}, Email: {email}, ELO: {elo}, Victories: {victories}, Defeats: {defeats}, Army: [{armyString}]";
+    }
 }

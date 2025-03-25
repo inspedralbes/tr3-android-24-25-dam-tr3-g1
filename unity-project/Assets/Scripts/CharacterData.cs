@@ -1,10 +1,8 @@
 using System;
 using UnityEngine;
-using Newtonsoft.Json;
-using System.Threading;
 
 [Serializable]
-public class Character : MonoBehaviour
+public class CharacterData
 {
     public int id;
     public string name;
@@ -25,7 +23,4 @@ public class Character : MonoBehaviour
     public int price;
     public bool hasMoved;
     public bool selected;
-
-    [JsonIgnore]
-    public CancellationToken destroyCancellationToken;
 }

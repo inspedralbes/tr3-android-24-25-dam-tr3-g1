@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 using System.Linq;
 using Newtonsoft.Json;
 
-
 [System.Serializable]
 public class CharacterWrapper
 {
@@ -20,11 +19,17 @@ public class ArmyController : MonoBehaviour
     private List<Character> characters;
     private LI_Army userArmy;
     private List<DropdownField> dropdowns;
-      int userId = 7;
+    private int userId;
 
     void Start()
     {
-        
+        if (UserManager.Instance == null || UserManager.Instance.CurrentUser == null)
+        {
+            Debug.LogError("UserManager.Instance or UserManager.Instance.CurrentUser is null");
+            return;
+        }
+
+        userId = UserManager.Instance.CurrentUser.id;
 
         var root = GetComponent<UIDocument>().rootVisualElement;
         var updateButton = root.Q<Button>("update");
@@ -35,6 +40,9 @@ public class ArmyController : MonoBehaviour
         {
             dropdown.RegisterValueChangedCallback(evt => OnDropdownValueChanged(dropdown));
         }
+        StartCoroutine(FetchCharacters());
+        updateButton.clicked += OnUpdateButtonClick;
+        playButton.clicked += OnPlayButtonClick;
     }
 
     private int findCharacterByName(string name)
@@ -49,11 +57,11 @@ public class ArmyController : MonoBehaviour
 
         return -1;
     }
+
     private void OnDropdownValueChanged(DropdownField dropdown)
     {
         int index = dropdowns.IndexOf(dropdown);
         var characterId = findCharacterByName(dropdown.value);
-
 
         switch (index)
         {
@@ -88,7 +96,8 @@ public class ArmyController : MonoBehaviour
         yield return request.SendWebRequest();
         Debug.Log("Fetching characters");
         Debug.Log(request.result);
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError){
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
             var wrapper = JsonConvert.DeserializeObject<CharacterWrapper>("{\"characters\":" + jsonResponse + "}");
             characters = new List<Character>(wrapper.characters);
         }
@@ -104,6 +113,7 @@ public class ArmyController : MonoBehaviour
             StartCoroutine(FetchUserArmy());
         }
     }
+
     [System.Serializable]
     public class CharacterList
     {

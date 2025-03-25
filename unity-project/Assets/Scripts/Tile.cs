@@ -14,6 +14,31 @@ public class Tile : MonoBehaviour
     public bool movable = false;
 
     public bool attackable = false;
+    private int? _userId;
+    public int userId
+    {
+        get
+        {
+            if (!_userId.HasValue)
+            {
+                _userId = UserManager.Instance?.CurrentUser.id ?? 0;
+            }
+            return _userId.Value;
+        }
+    }
+
+    private TurnManager _turnManager;
+    public TurnManager turnManager
+    {
+        get
+        {
+            if (_turnManager == null)
+            {
+                _turnManager = TurnManager.Instance;
+            }
+            return _turnManager;
+        }
+    }
 
     public GameObject Character
     {
@@ -68,20 +93,20 @@ public class Tile : MonoBehaviour
         return null;
     }
 
-    void moveUnit(Tile tileOrigin, Tile tileDestination)
+    public void moveUnit(Tile tileOrigin, Tile tileDestination)
     {
 
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager != null)
         {
             Character characterToMove = null;
-            if (gridManager._army1.Contains(tileOrigin.CharacterData))
+            if (turnManager.player1.army.Contains(tileOrigin.CharacterData))
             {
-                characterToMove = gridManager._army1.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = turnManager.player1.army.Find(c => c == tileOrigin.CharacterData);
             }
-            else if (gridManager._army2.Contains(tileOrigin.CharacterData))
+            else if (turnManager.player2.army.Contains(tileOrigin.CharacterData))
             {
-                characterToMove = gridManager._army2.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = turnManager.player2.army.Find(c => c == tileOrigin.CharacterData);
             }
             Debug.Log("Character to move: " + characterToMove.name);
             characterToMove.transform.SetParent(tileDestination.transform);
@@ -114,6 +139,16 @@ public class Tile : MonoBehaviour
             tile.attackable = false;
             RemoveFilters(tile);
         }
+
+        // Send makeMove event
+        var moveData = new
+        {
+            origin = new { x = tileOrigin.x, y = tileOrigin.y },
+            destination = new { x = tileDestination.x, y = tileDestination.y },
+            userId = userId
+        };
+        string moveJson = JsonUtility.ToJson(moveData);
+        WebSocketManager.Instance.SendMove(moveJson);
     }
 
 
@@ -214,12 +249,12 @@ public class Tile : MonoBehaviour
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager == null) return;
 
-        if (this.attackable && _characterData != null && !gridManager._army1.Contains(_characterData))
+        if (this.attackable && _characterData != null && !turnManager.player1.army.Contains(_characterData))
         {
             Attack();
             return;
         }
-        else if (_characterData != null && !gridManager._army1.Contains(_characterData))
+        else if (_characterData != null && !turnManager.player1.army.Contains(_characterData))
         {
             Debug.Log("Cannot control characters from army2.");
             return;
@@ -279,7 +314,7 @@ public class Tile : MonoBehaviour
         }
 
         // Verificar que el objetivo no es un aliado
-        if (gridManager._army1.Contains(this.CharacterData))
+        if (turnManager.player1.army.Contains(this.CharacterData))
         {
             Debug.LogWarning("⚠️ Cannot attack an allied unit.");
             return;
@@ -538,8 +573,8 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
-                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
+                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
+                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
                 {
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
                     if (renderer != null)
@@ -571,8 +606,8 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((gridManager._army1.Contains(tile.CharacterData) && gridManager._army1.Contains(CharacterData)) ||
-                    (gridManager._army2.Contains(tile.CharacterData) && gridManager._army2.Contains(CharacterData)))
+                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
+                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
                 {
                     // Same army, do not mark as attackable
                     tile.attackable = false;

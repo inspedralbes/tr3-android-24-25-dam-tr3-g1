@@ -12,9 +12,6 @@ public class GridManager : MonoBehaviour
 
     private float _tileSize;
 
-    public TurnManager turnManager;
-
-
     void GenerateGrid()
     {
         float screenRatio = (float)Screen.width / (float)Screen.height;
@@ -41,7 +38,6 @@ public class GridManager : MonoBehaviour
                 spawnedTile.name = $"Tile {x} {y}";
                 spawnedTile.GetComponent<Tile>().x = x;
                 spawnedTile.GetComponent<Tile>().y = y;
-                spawnedTile.GetComponent<Tile>().turnManager = turnManager;
                 var spriteRenderer = spawnedTile.GetComponent<SpriteRenderer>();
                 if (spriteRenderer != null)
                 {
@@ -69,7 +65,7 @@ public class GridManager : MonoBehaviour
 
     void StartCharacter(int x, int y, int characterNumber, List<Character> armyManager)
     {
-        if (_characterPrefab == null)
+        if (_characterPrefab != null)
         {
             var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
             character.name = $"Character {characterNumber}";
@@ -113,20 +109,19 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        turnManager = TurnManager.Instance;
-        Debug.Log("TurnManager: " + turnManager.player1.army);
-        Debug.Log("TurnManager: " + turnManager.player2.army);
+        Debug.Log("TurnManager: " + TurnManager.Instance.player1.army);
+        Debug.Log("TurnManager: " + TurnManager.Instance.player2.army);
         GenerateGrid();
         int half = (_height / 2 + 4) - (_height / 2 - 4);
         for (int i = 0; i < half; i++)
         {
             if (i < half / 2)
             {
-                StartCharacter(0, _height / 2 - 2 + i, i, turnManager.player1.army);
+                StartCharacter(0, _height / 2 - 2 + i, i, TurnManager.Instance.player1.army);
             }
             else
             {
-                StartCharacter(_width - 1, _height / 2 - 2 + (i - half / 2), i, turnManager.player2.army);
+                StartCharacter(_width - 1, _height / 2 - 2 + (i - half / 2), i, TurnManager.Instance.player2.army);
             }
         }
     }

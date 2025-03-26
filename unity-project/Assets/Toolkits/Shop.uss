@@ -4,53 +4,60 @@
     color: rgb(68, 138, 255);
 }
 
-.Title{
+.Title {
     font-size: 30px;
     -unity-font-style: bold;
-    color: rgb(255, 74, 68);
+    color: rgb(68, 138, 255);
     align-items: center;
     top: 4%;
     left: auto;
-    /* -unity-text-align: middle-center; */
     align-self: center;
     width: 100%;
-    display:block
+    display: block;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
 }
-.CardDisplay{
+
+.CardDisplay {
     background-color: rgb(255, 255, 255);
     border-radius: 10px;
-    height: calc(100% - 50px);
+    height: ;
     flex-grow: 1;
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: ;
     overflow: auto;
     box-sizing: border-box;
-    margin-top: 50px; /* Add margin to avoid covering the title */
+    margin-top: 50px;
 }
-.Card{
+
+.Card {
     background-color: rgb(65, 154, 164);
     border-radius: 10px;
     padding: 10px;
     margin: 10px;
     flex-grow: 1;
     border: 3px solid rgb(0, 0, 0);
-    width:20%;
+    width: 20%;
     box-sizing: border-box;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
 }
-.UnitName{
+
+.UnitName {
     font-size: 20px;
     -unity-font-style: bold;
     color: rgb(255, 255, 255);
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
 }
-.image{
+
+.image {
     flex-grow: 1;
     width: 80%;
     margin-left: 10%;
     margin-right: 10%;
     color: rgb(68, 138, 255);
 }
-.BuyButton{
+
+.BuyButton {
     background-color: rgb(68, 138, 255);
     color: rgb(255, 255, 255);
     border-radius: 10px;
@@ -58,8 +65,10 @@
     margin: 10px;
     font-size: 20px;
     -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
 }
-.BackButton{
+
+.BackButton {
     background-color: rgb(68, 138, 255);
     color: rgb(255, 255, 255);
     border-radius: 50%;
@@ -68,7 +77,7 @@
     font-size: 20px;
     -unity-font-style: bold;
     position: absolute;
-    width: 50px; /* Adjust width and height to make it round */
+    width: 50px;
     height: 50px;
     display: flex;
     justify-content: center;

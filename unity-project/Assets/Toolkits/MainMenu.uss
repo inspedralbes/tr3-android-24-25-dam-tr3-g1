@@ -1,58 +1,55 @@
-@font-face {
-    font-family: 'ThaleahPixelFont';
-    src: url('Assets/Thaleah_PixelFont/ThaleahFat.ttf');
-}
-
 .background {
     background-color: rgb(255, 255, 255);
     border-radius: 10px;
-    height: 80%; /* Set height to 80% */
+    height: 80%;
     flex-grow: 1;
     width: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Center the content vertically */
+    justify-content: center;
     overflow: auto;
     box-sizing: border-box;
-    margin-top: 50px; /* Add margin to avoid covering the title */
+    margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .title {
-    font-family: 'ThaleahPixelFont';
-    font-size: 30px;
-    -unity-font-style: bold;
+    font-family: "ThaleahPixelFont";
+    font-size: 80% -unity-font-style bold;
     color: rgb(255, 74, 68);
     align-items: center;
     margin-top: 10%;
     text-align: center;
     align-self: center;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+    width: 100%;
 }
 
 .menu-button {
-    font-family: 'ThaleahPixelFont';
+    font-family: "ThaleahPixelFont";
     background-color: rgb(68, 138, 255);
     color: rgb(255, 255, 255);
     border-radius: 10px;
     padding: 10px;
     margin: 10px;
-    font-size: 20px;
+    font-size: 150%;
     -unity-font-style: bold;
-    width: 200px; /* Set a fixed width for all buttons */
+    width: 80%;
     text-align: center;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
 }
 
 .menu-button:hover {
-    font-family: 'ThaleahPixelFont';
+    font-family: "ThaleahPixelFont";
     background-color: rgb(115, 159, 236);
     color: rgb(255, 255, 255);
     border-radius: 10px;
     padding: 10px;
     margin: 10px;
-    font-size: 20px;
+    font-size: 150%;
     -unity-font-style: bold;
-    width: 200px; /* Ensure hover state has the same width */
+    width: 80%;
     text-align: center;
 }

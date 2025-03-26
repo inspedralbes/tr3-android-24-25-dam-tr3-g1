@@ -33,11 +33,13 @@ public class AutoSpriteGridProcessor : EditorWindow
             {
                 Debug.Log($"✅ Procesando carpeta: {folder}");
                 processedSprites += ProcessFolder(folder);
+                GenerateCombinedSprite(folder);
                 processedFolders++;
             }
         }
 
         AssetDatabase.Refresh();
+
         Debug.Log($"✅ Proceso finalizado. Carpetas procesadas: {processedFolders}, Sprites modificados: {processedSprites}");
     }
 
@@ -159,12 +161,6 @@ public class AutoSpriteGridProcessor : EditorWindow
             {
                 ProcessCustomSprite(file, 9, 4); // Recorte personalizado (2 columnas x 4 filas)
             }
-
-            else
-            {
-                // Recorte por defecto (tanto para "standard" como para "custom")
-                ProcessCustomSprite(file, gridCellSize, gridCellSize); // Usamos el tamaño de celda estándar
-            }
             processedSprites++;
         }
 
@@ -234,5 +230,84 @@ public class AutoSpriteGridProcessor : EditorWindow
         }
 
         return sprites;
+    }
+    static void GenerateCombinedSprite(string folder)
+    {
+        AssetDatabase.Refresh();
+
+        string[] spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
+                                            .Select(AssetDatabase.GUIDToAssetPath)
+                                            .Where(filePath => filePath.EndsWith("walk_128.png"))
+                                            .ToArray();
+
+        if (spritePaths.Length == 0)
+        {
+            Debug.LogWarning("⚠️ No se encontró el sprite walk_128.png.");
+            return;
+        }
+
+        string walkSpritePath = spritePaths[0];
+        Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(walkSpritePath).OfType<Sprite>().ToArray();
+
+        if (sprites.Length < 20)
+        {
+            Debug.LogError("❌ No se encontraron suficientes sprites en walk_128.png.");
+            return;
+        }
+
+        // Obtener los sprites
+        Sprite sprite18 = sprites[21];
+        Sprite sprite19 = sprites[25];
+
+        int combinedWidth = (int)Mathf.Max(sprite18.rect.width, sprite19.rect.width);
+        int combinedHeight = (int)(sprite18.rect.height + sprite19.rect.height);
+
+        Texture2D combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false);
+
+        // Rellenar con transparente primero
+        Color[] transparentPixels = new Color[combinedWidth * combinedHeight];
+        for (int i = 0; i < transparentPixels.Length; i++)
+        {
+            transparentPixels[i] = Color.clear;
+        }
+        combinedTexture.SetPixels(transparentPixels);
+
+        // Copiar el primer sprite (parte superior)
+        combinedTexture.SetPixels(
+            0,
+            0,
+            (int)sprite18.rect.width,
+            (int)sprite18.rect.height,
+            sprite18.texture.GetPixels(
+                (int)sprite18.rect.x,
+                (int)sprite18.rect.y,
+                (int)sprite18.rect.width,
+                (int)sprite18.rect.height
+            )
+        );
+
+        // Copiar el segundo sprite (parte inferior)
+        combinedTexture.SetPixels(
+            0,
+            (int)sprite18.rect.height,
+            (int)sprite19.rect.width,
+            (int)sprite19.rect.height,
+            sprite19.texture.GetPixels(
+                (int)sprite19.rect.x,
+                (int)sprite19.rect.y,
+                (int)sprite19.rect.width,
+                (int)sprite19.rect.height
+            )
+        );
+
+        combinedTexture.Apply();
+
+        byte[] bytes = combinedTexture.EncodeToPNG();
+        File.WriteAllBytes(Path.Combine(folder, "idle_custom.png"), bytes);
+
+        ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2);
+
+        AssetDatabase.Refresh();
+        Debug.Log("✅ Nuevo sprite combinado generado: idle_custom.png");
     }
 }

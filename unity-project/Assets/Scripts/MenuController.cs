@@ -7,6 +7,8 @@ public class MenuController : MonoBehaviour
     // Referències als elements UI
     private Button playButton;
     private Button optionsButton;
+
+    private Button shopButton;
     private Button logoutButton;
 
     void OnEnable()
@@ -18,11 +20,13 @@ public class MenuController : MonoBehaviour
         playButton = rootVisualElement.Q<Button>("play");
         optionsButton = rootVisualElement.Q<Button>("options");
         logoutButton = rootVisualElement.Q<Button>("logout");
+        shopButton = rootVisualElement.Q<Button>("Botiga");
 
         // Assignem els esdeveniments als botons
         playButton.clicked += OnPlayButtonClicked;
         optionsButton.clicked += OnOptionsButtonClicked;
         logoutButton.clicked += OnLogoutButtonClicked;
+        shopButton.clicked += OnShopButtonClicked;
     }
 
     // Canvia a l'escena PlayScene
@@ -47,5 +51,9 @@ public class MenuController : MonoBehaviour
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
         #endif
+    }
+    void OnShopButtonClicked()
+    {
+        SceneManager.LoadScene("ShopScene");
     }
 }

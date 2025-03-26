@@ -12,6 +12,8 @@ public class LoginController : MonoBehaviour
     private TextField passwordField;
     private Button loginButton;
 
+    private Button registerButton;
+
     // URL de l'API on s'envien les credencials
     private const string loginUrl = "http://localhost:4000/login"; 
 
@@ -24,9 +26,11 @@ public class LoginController : MonoBehaviour
         emailField = root.Q<TextField>("email");
         passwordField = root.Q<TextField>("password");
         loginButton = root.Q<Button>("login");
+        registerButton = root.Q<Button>("Registrat");
 
         // Assigna l'event al botó
         loginButton.clicked += OnLoginButtonClicked;
+        registerButton.clicked += OnRegisterButtonClicked;
     }
 
     private void OnDisable()
@@ -43,6 +47,11 @@ public class LoginController : MonoBehaviour
 
         // Comença la petició HTTP asíncrona
         StartCoroutine(LoginRequest(email, password));
+    }
+
+    private void OnRegisterButtonClicked()
+    {
+        SceneManager.LoadScene("RegisterScene");
     }
 
     private IEnumerator LoginRequest(string email, string password)

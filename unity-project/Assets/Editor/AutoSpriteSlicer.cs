@@ -247,6 +247,18 @@ public class AutoSpriteGridProcessor : EditorWindow
         }
 
         string walkSpritePath = spritePaths[0];
+        TextureImporter importer = AssetImporter.GetAtPath(walkSpritePath) as TextureImporter;
+
+        if (importer == null)
+        {
+            Debug.LogError($"❌ No se pudo cargar el importador de la textura: {walkSpritePath}");
+            return;
+        }
+
+        // Asegurarse de que la textura sea legible
+        importer.isReadable = true;
+        importer.SaveAndReimport();
+
         Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(walkSpritePath).OfType<Sprite>().ToArray();
 
         if (sprites.Length < 20)
@@ -256,11 +268,11 @@ public class AutoSpriteGridProcessor : EditorWindow
         }
 
         // Obtener los sprites
-        Sprite sprite18 = sprites[21];
-        Sprite sprite19 = sprites[25];
+        Sprite sprite21 = sprites[21];
+        Sprite sprite25 = sprites[25];
 
-        int combinedWidth = (int)Mathf.Max(sprite18.rect.width, sprite19.rect.width);
-        int combinedHeight = (int)(sprite18.rect.height + sprite19.rect.height);
+        int combinedWidth = (int)Mathf.Max(sprite21.rect.width, sprite25.rect.width);
+        int combinedHeight = (int)(sprite21.rect.height + sprite25.rect.height);
 
         Texture2D combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false);
 
@@ -276,27 +288,27 @@ public class AutoSpriteGridProcessor : EditorWindow
         combinedTexture.SetPixels(
             0,
             0,
-            (int)sprite18.rect.width,
-            (int)sprite18.rect.height,
-            sprite18.texture.GetPixels(
-                (int)sprite18.rect.x,
-                (int)sprite18.rect.y,
-                (int)sprite18.rect.width,
-                (int)sprite18.rect.height
+            (int)sprite21.rect.width,
+            (int)sprite21.rect.height,
+            sprite21.texture.GetPixels(
+                (int)sprite21.rect.x,
+                (int)sprite21.rect.y,
+                (int)sprite21.rect.width,
+                (int)sprite21.rect.height
             )
         );
 
         // Copiar el segundo sprite (parte inferior)
         combinedTexture.SetPixels(
             0,
-            (int)sprite18.rect.height,
-            (int)sprite19.rect.width,
-            (int)sprite19.rect.height,
-            sprite19.texture.GetPixels(
-                (int)sprite19.rect.x,
-                (int)sprite19.rect.y,
-                (int)sprite19.rect.width,
-                (int)sprite19.rect.height
+            (int)sprite21.rect.height,
+            (int)sprite25.rect.width,
+            (int)sprite25.rect.height,
+            sprite25.texture.GetPixels(
+                (int)sprite25.rect.x,
+                (int)sprite25.rect.y,
+                (int)sprite25.rect.width,
+                (int)sprite25.rect.height
             )
         );
 

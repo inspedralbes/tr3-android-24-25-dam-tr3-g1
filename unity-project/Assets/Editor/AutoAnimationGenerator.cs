@@ -222,10 +222,10 @@ public class AutoAnimationGenerator : MonoBehaviour
                 }
                 else if (fileName.Contains("walk.png"))
                 {
-                    CreateAnimationClip(sprites, subFolderPath, "thrust_standard_Up", 0, 8);
-                    CreateAnimationClip(sprites, subFolderPath, "thrust_standard_Left", 9, 17);
-                    CreateAnimationClip(sprites, subFolderPath, "thrust_standard_Down", 18, 26);
-                    CreateAnimationClip(sprites, subFolderPath, "thrust_standard_Right", 27, 35);
+                    CreateAnimationClip(sprites, subFolderPath, "walk_standard_Up", 0, 8);
+                    CreateAnimationClip(sprites, subFolderPath, "walk_standard_Left", 9, 17);
+                    CreateAnimationClip(sprites, subFolderPath, "walk_standard_Down", 18, 26);
+                    CreateAnimationClip(sprites, subFolderPath, "walk_standard_Right", 27, 35);
                 }
             }
         }

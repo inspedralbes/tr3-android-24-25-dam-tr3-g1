@@ -16,7 +16,7 @@ public class Character : MonoBehaviour
     public bool winged;
     public string sprite;
     public string icon;
-    public float atk;
+    public int atk;
     public int movement;
     public int health;
     public int actualHealth;

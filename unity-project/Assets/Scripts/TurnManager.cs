@@ -9,20 +9,27 @@ public class TurnManager : MonoBehaviour
     public int currentPlayer = 1;
     public int turn = 1;
 
-    public User player1 = new User(); 
-    public User player2 = new User(); 
+    [SerializeField]
+    public User player1;
+    public User player2;
+
+    public bool IsArmyReady { get; private set; } = false;
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null  && Instance != this)
         {
+            Debug.Log("AWAKE::TurnManager instance destroyed");
+            Destroy(gameObject);
+            
+        }else
+        {
+            Debug.Log("AWAKE::TurnManager instance created");
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        
     }
 
     private void Start()
@@ -50,6 +57,11 @@ public class TurnManager : MonoBehaviour
     public string GetTurn()
     {
         return $"Turn {turn}";
+    }
+
+    public void SetArmyReady()
+    {
+        IsArmyReady = true;
     }
 }
 

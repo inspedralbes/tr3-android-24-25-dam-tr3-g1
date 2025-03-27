@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using Newtonsoft.Json; // Add this line
+using Newtonsoft.Json;
+using System.Linq;
 
 public class WebSocketManager : MonoBehaviour
 {
@@ -64,7 +65,26 @@ public class WebSocketManager : MonoBehaviour
     {
         // Crea un missatge JSON per enviar un moviment i l'envia
         string message = $"{{\"type\": \"makeMove\", \"room\": \"{currentRoom}\", \"move\": \"{move}\"}}";
+        Debug.Log($"📤 Enviat: {message}");
         await SendMessage(message);
+    }
+
+    public async Task SendMove(WebSocketManager.MoveData moveData)
+    {
+        // Crea un objecte per al missatge complet
+        var messageObject = new
+        {
+            type = "makeMove",
+            room = currentRoom,
+            move = moveData // Inclou l'objecte MoveData directament
+        };
+
+        // Serialitza l'objecte complet a JSON
+        string messageJson = JsonConvert.SerializeObject(messageObject);
+        Debug.Log($"📤 Enviat: {messageJson}");
+
+        // Envia el missatge serialitzat
+        await SendMessage(messageJson);
     }
 
     public async Task SendMessage(string message)
@@ -87,29 +107,27 @@ public class WebSocketManager : MonoBehaviour
 
     void ProcessMessage(byte[] data)
     {
-        // Convert the received data to a string
         string message = Encoding.UTF8.GetString(data);
         Debug.Log($"📩 Rebut: {message}");
 
-        // Process the received message
         if (message.Contains("\"matchFound\""))
         {
             Debug.Log("🎮 Partida trobada!");
-            Debug.Log($"💬 {message}");
             MatchFoundMessage matchFoundMessage = JsonConvert.DeserializeObject<MatchFoundMessage>(message);
-            Debug.Log($"💬 {matchFoundMessage}");
+
             if (matchFoundMessage != null && matchFoundMessage.players != null)
             {
                 TurnManager.Instance.player1 = matchFoundMessage.players[0];
                 TurnManager.Instance.player2 = matchFoundMessage.players[1];
-                TurnManager.Instance.player1.army = matchFoundMessage.armies[0].ConvertAll(data => ConvertToCharacter(data)); 
-                TurnManager.Instance.player2.army = matchFoundMessage.armies[1].ConvertAll(data => ConvertToCharacter(data)); 
-                currentRoom = matchFoundMessage.room; 
 
-                // Debug logs to verify the armies
-                Debug.Log($"Player 1 Army: {JsonConvert.SerializeObject(TurnManager.Instance.player1.army, Formatting.Indented)}");
-                Debug.Log($"Player 2 Army: {JsonConvert.SerializeObject(TurnManager.Instance.player2.army, Formatting.Indented)}");
+                TurnManager.Instance.player1.army = MapCharacterDataToCharacter(matchFoundMessage.armies[0]);
+                TurnManager.Instance.player2.army = MapCharacterDataToCharacter(matchFoundMessage.armies[1]);
+
+                TurnManager.Instance.SetArmyReady(); // Mark armies as ready
+
+                currentRoom = matchFoundMessage.room;
             }
+
             Debug.Log($"👤 Jugador 1: {TurnManager.Instance.player1.ToString()}");
             Debug.Log($"👤 Jugador 2: {TurnManager.Instance.player2.ToString()}");
 
@@ -118,15 +136,34 @@ public class WebSocketManager : MonoBehaviour
         else if (message.Contains("\"opponentMove\""))
         {
             Debug.Log("🏹 L'oponent ha fet un moviment!");
-            var moveData = JsonConvert.DeserializeObject<MoveData>(message);
-            if (moveData != null)
+            var opponentMoveMessage = JsonConvert.DeserializeObject<OpponentMoveMessage>(message);
+
+            if (opponentMoveMessage == null || opponentMoveMessage.move == null)
             {
-                Tile tileOrigin = FindTile(moveData.origin.x, moveData.origin.y);
-                Tile tileDestination = FindTile(moveData.destination.x, moveData.destination.y);
-                if (tileOrigin != null && tileDestination != null)
-                {
-                    tileOrigin.moveUnit(tileOrigin, tileDestination);
-                }
+                Debug.LogError("❌ Error: opponentMoveMessage or move is null after deserialization.");
+                return;
+            }
+
+            MoveData moveData = opponentMoveMessage.move;
+            Debug.Log($"Movedata: {moveData.ToString()}");
+            Debug.Log($"🏹 Moviment rebut: {moveData.origin.x}, {moveData.origin.y} -> {moveData.destination.x}, {moveData.destination.y}");
+
+            Tile tileOrigin = FindTile(moveData.origin.x, moveData.origin.y);
+            Tile tileDestination = FindTile(moveData.destination.x, moveData.destination.y);
+
+            if (tileOrigin == null)
+            {
+                Debug.LogError($"❌ Error: Tile at origin ({moveData.origin.x}, {moveData.origin.y}) not found.");
+            }
+
+            if (tileDestination == null)
+            {
+                Debug.LogError($"❌ Error: Tile at destination ({moveData.destination.x}, {moveData.destination.y}) not found.");
+            }
+
+            if (tileOrigin != null && tileDestination != null)
+            {
+                tileOrigin.moveUnit(tileOrigin, tileDestination);
             }
         }
         else if (message.Contains("\"gameOver\""))
@@ -162,42 +199,60 @@ public class WebSocketManager : MonoBehaviour
         return null;
     }
 
-    private Character ConvertToCharacter(CharacterData data)
+    private List<Character> MapCharacterDataToCharacter(List<CharacterData> characterDataList)
     {
-        // Create a new Character instance and copy the data from CharacterData
-        Character character = new GameObject().AddComponent<Character>();
-        character.id = data.id;
-        character.name = data.name;
-        character.weapon = data.weapon;
-        character.vs_sword = data.vs_sword;
-        character.vs_spear = data.vs_spear;
-        character.vs_axe = data.vs_axe;
-        character.vs_bow = data.vs_bow;
-        character.vs_magic = data.vs_magic;
-        character.distance = data.distance;
-        character.winged = data.winged;
-        character.sprite = data.sprite;
-        character.icon = data.icon;
-        character.atk = data.atk;
-        character.movement = data.movement;
-        character.health = data.health;
-        character.actualHealth = data.actualHealth;
-        character.price = data.price;
-        character.hasMoved = data.hasMoved;
-        character.selected = data.selected;
-        return character;
+        List<Character> characters = new List<Character>();
+
+        foreach (var data in characterDataList)
+        {
+            // Instantiate a new GameObject for each character
+            GameObject characterObject = new GameObject(data.name);
+            Character character = characterObject.AddComponent<Character>();
+
+            // Copy data from CharacterData to Character
+            character.id = data.id;
+            character.name = data.name;
+            character.weapon = data.weapon;
+            character.vs_sword = data.vs_sword;
+            character.vs_spear = data.vs_spear;
+            character.vs_axe = data.vs_axe;
+            character.vs_bow = data.vs_bow;
+            character.vs_magic = data.vs_magic;
+            character.distance = data.distance;
+            character.winged = data.winged;
+            character.sprite = data.sprite;
+            character.icon = data.icon;
+            character.atk = data.atk;
+            character.movement = data.movement;
+            character.health = data.health;
+            character.actualHealth = data.health; 
+            character.price = data.price;
+
+            characters.Add(character);
+        }
+
+        return characters;
     }
 
+    [System.Serializable]
     public class MoveData
     {
-        public Position origin { get; set; }
-        public Position destination { get; set; }
-        public int userId { get; set; }
+        public Position origin;
+        public Position destination;
+        public int userId;
     }
 
+    [System.Serializable]
     public class Position
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        public int x;
+        public int y;
+    }
+
+    [System.Serializable]
+    public class OpponentMoveMessage
+    {
+        public string type;
+        public MoveData move;
     }
 }

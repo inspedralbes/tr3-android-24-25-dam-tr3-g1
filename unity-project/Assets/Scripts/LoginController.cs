@@ -3,7 +3,9 @@ using UnityEngine.UIElements;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json; // Add this import for Newtonsoft.Json
 
 public class LoginController : MonoBehaviour
 {
@@ -75,6 +77,30 @@ public class LoginController : MonoBehaviour
                 {
                     // Desa la informació de l'usuari
                     UserManager.Instance.SetUser(user);
+
+                    // Fa una crida addicional per obtenir els personatges de l'usuari
+                    string charactersUrl = $"http://localhost:4000/armies/{UserManager.Instance.CurrentUser.id}/characters";
+                    using (UnityWebRequest charactersRequest = UnityWebRequest.Get(charactersUrl))
+                    {
+                        yield return charactersRequest.SendWebRequest();
+
+                        if (charactersRequest.result == UnityWebRequest.Result.Success)
+                        {
+                            string charactersResponse = charactersRequest.downloadHandler.text;
+                            Debug.Log("Resposta dels personatges: " + charactersResponse);
+
+                            // Deserialitza la resposta JSON a una llista de personatges
+                            List<Character> characters = JsonConvert.DeserializeObject<List<Character>>(charactersResponse);
+                            Debug.Log("Personatges: " + characters[0].name);
+
+                            // Desa els personatges a l'exèrcit del jugador 1
+                            TurnManager.Instance.player1.army = characters;
+                        }
+                        else
+                        {
+                            Debug.LogError("Error obtenint els personatges: " + charactersRequest.error);
+                        }
+                    }
 
                     SceneManager.LoadScene("MenuScene"); // Canvia a l'escena del menú
                 }

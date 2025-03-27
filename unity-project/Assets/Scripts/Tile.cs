@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using System;
+using Newtonsoft.Json;
 
 public class Tile : MonoBehaviour
 {
@@ -95,7 +96,6 @@ public class Tile : MonoBehaviour
 
     public void moveUnit(Tile tileOrigin, Tile tileDestination)
     {
-
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager != null)
         {
@@ -128,7 +128,6 @@ public class Tile : MonoBehaviour
         if (tileDestination.Character != null)
         {
             unityMovesInAPath(tileDestination);
-            // tileDestination.Character.transform.position = new Vector3(tileDestination.x, tileDestination.y, tileDestination.Character.transform.position.z);
         }
 
         // Reset all tiles to default state
@@ -137,20 +136,19 @@ public class Tile : MonoBehaviour
         {
             tile.movable = false;
             tile.attackable = false;
-            RemoveFilters(tile);
+            RemoveFilters(tile); 
         }
 
-        // Send makeMove event
-        var moveData = new
+        WebSocketManager.MoveData moveData = new WebSocketManager.MoveData
         {
-            origin = new { x = tileOrigin.x, y = tileOrigin.y },
-            destination = new { x = tileDestination.x, y = tileDestination.y },
+            origin = new WebSocketManager.Position { x = tileOrigin.x, y = tileOrigin.y },
+            destination = new WebSocketManager.Position { x = tileDestination.x, y = tileDestination.y },
             userId = userId
         };
-        string moveJson = JsonUtility.ToJson(moveData);
-        WebSocketManager.Instance.SendMove(moveJson);
-    }
 
+        // Envia l'objecte MoveData
+        WebSocketManager.Instance.SendMove(moveData);
+    }
 
     void unityMovesInAPath(Tile tileDestination)
     {
@@ -245,6 +243,10 @@ public class Tile : MonoBehaviour
     {
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
+        Debug.Log("Character data: " + JsonUtility.ToJson(_characterData, true));
+        Debug.Log("Character: " + _character);
+        Debug.Log("TurnManager: " + turnManager.player1.ToString());
+        Debug.Log("TurnManager: " + turnManager.player2.ToString());
 
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager == null) return;

@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-[Serializable]
+[System.Serializable]
 public class CharacterData
 {
     public int id;
@@ -19,8 +16,5 @@ public class CharacterData
     public int atk;
     public int movement;
     public int health;
-    public int actualHealth;
     public int price;
-    public bool hasMoved;
-    public bool selected;
 }

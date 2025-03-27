@@ -63,38 +63,44 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    void StartCharacter(int x, int y, int characterNumber, List<Character> armyManager)
+    void StartCharacter(int x, int y, Character characterData)
     {
         if (_characterPrefab != null)
         {
+            // Instantiate the character prefab at the specified position
             var character = Instantiate(_characterPrefab, new Vector3(x * _tileSize, y * _tileSize, -1), Quaternion.identity);
-            character.name = $"Character {characterNumber}";
-            var characterData = character.AddComponent<Character>();
-            characterData.id = characterNumber;
-            characterData.name = $"Character {characterNumber}";
-            characterData.weapon = "SWORD";
-            characterData.vs_sword = 0.4f;
-            characterData.vs_spear = 1.0f;
-            characterData.vs_axe = 1.0f;
-            characterData.vs_bow = 1.0f;
-            characterData.vs_magic = 1.0f;
-            characterData.winged = false;
-            characterData.sprite = "character_sprite";
-            characterData.icon = "character_icon";
-            characterData.atk = 10;
-            characterData.movement = 4;
-            characterData.health = 100;
-            characterData.actualHealth = 100;
-            characterData.distance = 1;
-            characterData.hasMoved = false;
+            character.name = characterData.name;
+
+            // Add the Character component and populate its properties
+            var characterComponent = character.AddComponent<Character>();
+            characterComponent.id = characterData.id;
+            characterComponent.name = characterData.name;
+            characterComponent.weapon = characterData.weapon;
+            characterComponent.vs_sword = characterData.vs_sword;
+            characterComponent.vs_spear = characterData.vs_spear;
+            characterComponent.vs_axe = characterData.vs_axe;
+            characterComponent.vs_bow = characterData.vs_bow;
+            characterComponent.vs_magic = characterData.vs_magic;
+            characterComponent.winged = characterData.winged;
+            characterComponent.sprite = characterData.sprite;
+            characterComponent.icon = "character_icon";
+            characterComponent.atk = characterData.atk;
+            characterComponent.movement = characterData.movement;
+            characterComponent.health = characterData.health;
+            characterComponent.actualHealth = characterData.actualHealth;
+            characterComponent.distance = characterData.distance;
+            characterComponent.hasMoved = characterData.hasMoved;
+
+            // Find the tile at the specified position and assign the character to it
             var tile = GameObject.Find($"Tile {x} {y}");
             if (tile != null)
             {
-                tile.GetComponent<Tile>().Character = character;
-                tile.GetComponent<Tile>().CharacterData = characterData;
-                tile.GetComponent<Tile>().isOccupied = true;
-                Debug.LogWarning("Character for army " + armyManager + " created at " + x + " " + y);
-                armyManager.Add(characterData);
+                var tileComponent = tile.GetComponent<Tile>();
+                tileComponent.Character = character;
+                tileComponent.CharacterData = characterComponent;
+                tileComponent.isOccupied = true;
+
+                Debug.Log($"Character {characterData.name} created at {x}, {y}");
             }
             else
             {
@@ -109,20 +115,32 @@ public class GridManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("TurnManager: " + TurnManager.Instance.player1.army);
-        Debug.Log("TurnManager: " + TurnManager.Instance.player2.army);
-        GenerateGrid();
-        int half = (_height / 2 + 4) - (_height / 2 - 4);
-        for (int i = 0; i < half; i++)
+        Debug.Log("TurnManager: " + TurnManager.Instance.player1.ToString());
+        Debug.Log("TurnManager: " + TurnManager.Instance.player2.ToString());
+        StartCoroutine(WaitForArmyReady());
+    }
+
+    private IEnumerator WaitForArmyReady()
+    {
+        while (!TurnManager.Instance.IsArmyReady)
         {
-            if (i < half / 2)
-            {
-                StartCharacter(0, _height / 2 - 2 + i, i, TurnManager.Instance.player1.army);
-            }
-            else
-            {
-                StartCharacter(_width - 1, _height / 2 - 2 + (i - half / 2), i, TurnManager.Instance.player2.army);
-            }
+            yield return null; // Wait for the next frame
+        }
+
+        Debug.Log("TurnManager: " + TurnManager.Instance.player1.ToString());
+        Debug.Log("TurnManager: " + TurnManager.Instance.player2.ToString());
+        GenerateGrid();
+
+        // Place player 1's army
+        for (int i = 0; i < TurnManager.Instance.player1.army.Count; i++)
+        {
+            StartCharacter(0, _height / 2 - 2 + i, TurnManager.Instance.player1.army[i]);
+        }
+
+        // Place player 2's army
+        for (int i = 0; i < TurnManager.Instance.player2.army.Count; i++)
+        {
+            StartCharacter(_width - 1, _height / 2 - 2 + i, TurnManager.Instance.player2.army[i]);
         }
     }
 

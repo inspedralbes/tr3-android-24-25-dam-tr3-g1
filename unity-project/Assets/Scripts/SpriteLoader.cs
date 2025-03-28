@@ -1,23 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
 using System.IO;
 using UnityEditor.Animations;
 using System.Linq;
+using UnityEditor.Overlays;
 
 public class SpriteLoader : MonoBehaviour
 {
-    private string spriteServerUrl = "http://localhost:4000/sprites";
-    private string assetBundlePath = "Assets/AssetBundles/";
-    //private string assetBundleUrl = "http://localhost:4000/assetbundles/";
-    //private string localCachePath = Application.persistentDataPath + "/AssetBundles/";
-
-    void Start()
+    [MenuItem("Tools/Sprites")]
+    static void ExecuteSprites()
     {
-        StartCoroutine(LoadSpritesFromServer());
+        GameObject tempGameObject = new GameObject("SpriteLoaderTemp");
+        SpriteLoader instance = tempGameObject.AddComponent<SpriteLoader>();
+        instance.StartCoroutine(instance.LoadSpritesFromServer());
     }
+
+    public string spriteServerUrl = "http://localhost:4000/sprites";
+    string assetBundlePath = "Assets/AssetBundles/";
+    string savePath = "Assets/Prefabs/";
 
     IEnumerator LoadSpritesFromServer()
     {
@@ -52,325 +56,332 @@ public class SpriteLoader : MonoBehaviour
 
                 foreach (string spritePath in spritePaths)
                 {
-                    yield return StartCoroutine(DownloadSprite(spritePath, folderName));
+                    Debug.Log($"🔽 Descargando sprite: {spritePath}");
+                    DownloadSprite(spritePath, folderName);
                 }
                 string folderPath = Path.Combine("Assets/Sprites", folderName);
                 GenerateCombinedSprite(folderPath);
                 ProcessFolder(folderPath);
                 ProcessAnimationFolder(folderPath, folderName);
+                //CreateController(folderName);
             }
         }
-    }
 
-    IEnumerator DownloadSprite(string url, string folderName)
-    {
-        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+        // Destruir el GameObject temporal después de completar la coroutine
+
+        DestroyImmediate(gameObject);
+
+        IEnumerator DownloadSprite(string url, string folderName)
         {
-            yield return request.SendWebRequest();
 
-            if (request.result != UnityWebRequest.Result.Success)
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
-                Debug.LogError("❌ Error al descargar el sprite: " + request.error);
-                yield break;
-            }
+                yield return request.SendWebRequest();
 
-            Texture2D texture = DownloadHandlerTexture.GetContent(request);
-            byte[] bytes = texture.EncodeToPNG();
-            string fileName = Path.GetFileName(url);
-            string filePath = Path.Combine("Assets/Sprites", folderName, fileName);
-
-            File.WriteAllBytes(filePath, bytes);
-            Debug.Log($"✅ Sprite descargado y guardado en: {filePath}");
-        }
-    }
-
-    static int ProcessFolder(string folder)
-    {
-        int processedSprites = 0;
-
-        string[] files = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
-                            .Select(AssetDatabase.GUIDToAssetPath)
-                            .Where(filePath => filePath.EndsWith(".png"))
-                            .ToArray();
-
-        if (files.Length == 0)
-            Debug.Log($"⚠️ No se encontraron imágenes en: {folder}");
-
-        foreach (string file in files)
-        {
-            Debug.Log($"🎨 Sprite encontrado: {file}");
-
-            // Lógica especial de recorte para ciertos archivos en "custom"
-            if (file.EndsWith("backslash_128.png"))
-            {
-                ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
-            }
-            else if (file.EndsWith("halfslash_128.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("slash_128.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("slash_oversize.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("slash_reverse_oversize.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("thrust_oversize.png"))
-            {
-                ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
-            }
-            else if (file.EndsWith("tool_rod.png"))
-            {
-                ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
-            }
-            else if (file.EndsWith("tool_whip.png"))
-            {
-                ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
-            }
-            else if (file.EndsWith("walk_128.png"))
-            {
-                ProcessCustomSprite(file, 9, 4); // Recorte personalizado (9 columnas x 4 filas)
-            }
-            else if (file.EndsWith("wheelchair.png"))
-            {
-                ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
-            }
-            // Lógica especial de recorte para ciertos archivos en "standard"
-            else if (file.EndsWith("backslash.png"))
-            {
-                ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
-            }
-            else if (file.EndsWith("climb.png"))
-            {
-                ProcessCustomSprite(file, 6, 1); // Recorte personalizado (6 columnas x 1 filas)
-            }
-            else if (file.EndsWith("combat_idle.png"))
-            {
-                ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
-            }
-            else if (file.EndsWith("emote.png"))
-            {
-                ProcessCustomSprite(file, 3, 4); // Recorte personalizado (3 columnas x 4 filas)
-            }
-            else if (file.EndsWith("halfslash.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("hurt.png"))
-            {
-                ProcessCustomSprite(file, 1, 6); // Recorte personalizado (1 columnas x 6 filas)
-            }
-            else if (file.EndsWith("idle.png"))
-            {
-                ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
-            }
-            else if (file.EndsWith("jump.png"))
-            {
-                ProcessCustomSprite(file, 5, 4); // Recorte personalizado (5 columnas x 4 filas)
-            }
-            else if (file.EndsWith("run.png"))
-            {
-                ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
-            }
-            else if (file.EndsWith("shoot.png"))
-            {
-                ProcessCustomSprite(file, 13, 4); // Recorte personalizado (2 columnas x 4 filas)
-            }
-            else if (file.EndsWith("sit.png"))
-            {
-                ProcessCustomSprite(file, 3, 4); // Recorte personalizado (3 columnas x 4 filas)
-            }
-            else if (file.EndsWith("slash.png"))
-            {
-                ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
-            }
-            else if (file.EndsWith("spellcast.png"))
-            {
-                ProcessCustomSprite(file, 7, 4); // Recorte personalizado (7 columnas x 4 filas)
-            }
-            else if (file.EndsWith("thrust.png"))
-            {
-                ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
-            }
-            else if (file.EndsWith("walk.png"))
-            {
-                ProcessCustomSprite(file, 9, 4); // Recorte personalizado (2 columnas x 4 filas)
-            }
-            processedSprites++;
-        }
-
-        return processedSprites;
-    }
-
-    // Recorte personalizado (para "standard" y "custom")
-    static void ProcessCustomSprite(string assetPath, int cols, int rows)
-    {
-        ProcessSprite(assetPath, cols, rows);
-    }
-
-    // Recorte estándar o personalizado
-    static void ProcessSprite(string assetPath, int cols, int rows)
-    {
-
-        int pixelsPerUnit = 64;
-
-        TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-
-        if (importer == null)
-        {
-            Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {assetPath}");
-            return;
-        }
-
-        Debug.Log($"🛠️ Modificando sprite: {assetPath}");
-
-        // Aplicar configuración
-        importer.textureType = TextureImporterType.Sprite;
-        importer.spriteImportMode = SpriteImportMode.Multiple; // Modo múltiple para recorte en grilla
-        importer.spritePixelsPerUnit = pixelsPerUnit;
-
-        // Establecer el recorte con el número de columnas y filas específicos
-        importer.spritesheet = GenerateGridSlices(importer, cols, rows);
-
-        // Forzar reimportación
-        EditorUtility.SetDirty(importer);
-        importer.SaveAndReimport();
-
-        Debug.Log($"✅ Sprite modificado y reimportado: {assetPath}");
-    }
-
-    // Recorte utilizando el número de columnas y filas específicos
-    static SpriteMetaData[] GenerateGridSlices(TextureImporter importer, int cols, int rows)
-    {
-        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(importer.assetPath);
-        if (texture == null)
-        {
-            Debug.LogError($"❌ No se pudo cargar la textura: {importer.assetPath}");
-            return new SpriteMetaData[0];
-        }
-
-        Debug.Log($"📏 Grid aplicado: {cols} columnas, {rows} filas en {importer.assetPath}");
-
-        SpriteMetaData[] sprites = new SpriteMetaData[cols * rows];
-
-        for (int y = 0; y < rows; y++)
-        {
-            for (int x = 0; x < cols; x++)
-            {
-                int index = y * cols + x;
-                sprites[index] = new SpriteMetaData
+                if (request.result != UnityWebRequest.Result.Success)
                 {
-                    rect = new Rect(x * (texture.width / cols), texture.height - (y + 1) * (texture.height / rows), texture.width / cols, texture.height / rows),
-                    name = Path.GetFileNameWithoutExtension(importer.assetPath) + "_" + index,
-                    alignment = (int)SpriteAlignment.Center
-                };
+                    Debug.LogError("❌ Error al descargar el sprite: " + request.error);
+                    yield break;
+                }
+
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                byte[] bytes = texture.EncodeToPNG();
+
+                string fileName = Path.GetFileName(url);
+                string filePath = Path.Combine("Assets/Sprites", folderName, fileName);
+
+                File.WriteAllBytes(filePath, bytes);
+                Debug.Log($"✅ Sprite descargado y guardado en: {filePath}");
             }
         }
 
-        return sprites;
-    }
-
-    static void GenerateCombinedSprite(string folder)
-    {
-        AssetDatabase.Refresh();
-
-        string[] spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
-                                            .Select(AssetDatabase.GUIDToAssetPath)
-                                            .Where(filePath => filePath.EndsWith("walk_128.png"))
-                                            .ToArray();
-
-        if (spritePaths.Length == 0)
+        static int ProcessFolder(string folder)
         {
-            Debug.LogWarning("⚠️ No se encontró el sprite walk_128.png.");
-            return;
+            int processedSprites = 0;
+
+            string[] files = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
+                                .Select(AssetDatabase.GUIDToAssetPath)
+                                .Where(filePath => filePath.EndsWith(".png"))
+                                .ToArray();
+
+            if (files.Length == 0)
+                Debug.Log($"⚠️ No se encontraron imágenes en: {folder}");
+
+            foreach (string file in files)
+            {
+                Debug.Log($"🎨 Sprite encontrado: {file}");
+
+                // Lógica especial de recorte para ciertos archivos en "custom"
+                if (file.EndsWith("backslash_128.png"))
+                {
+                    ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
+                }
+                else if (file.EndsWith("halfslash_128.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("slash_128.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("slash_oversize.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("slash_reverse_oversize.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("thrust_oversize.png"))
+                {
+                    ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
+                }
+                else if (file.EndsWith("tool_rod.png"))
+                {
+                    ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
+                }
+                else if (file.EndsWith("tool_whip.png"))
+                {
+                    ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
+                }
+                else if (file.EndsWith("walk_128.png"))
+                {
+                    ProcessCustomSprite(file, 9, 4); // Recorte personalizado (9 columnas x 4 filas)
+                }
+                else if (file.EndsWith("wheelchair.png"))
+                {
+                    ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
+                }
+                // Lógica especial de recorte para ciertos archivos en "standard"
+                else if (file.EndsWith("backslash.png"))
+                {
+                    ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
+                }
+                else if (file.EndsWith("climb.png"))
+                {
+                    ProcessCustomSprite(file, 6, 1); // Recorte personalizado (6 columnas x 1 filas)
+                }
+                else if (file.EndsWith("combat_idle.png"))
+                {
+                    ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
+                }
+                else if (file.EndsWith("emote.png"))
+                {
+                    ProcessCustomSprite(file, 3, 4); // Recorte personalizado (3 columnas x 4 filas)
+                }
+                else if (file.EndsWith("halfslash.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("hurt.png"))
+                {
+                    ProcessCustomSprite(file, 6, 1); // Recorte personalizado (6 columnas x 1 filas)
+                }
+                else if (file.EndsWith("idle.png"))
+                {
+                    ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
+                }
+                else if (file.EndsWith("jump.png"))
+                {
+                    ProcessCustomSprite(file, 5, 4); // Recorte personalizado (5 columnas x 4 filas)
+                }
+                else if (file.EndsWith("run.png"))
+                {
+                    ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
+                }
+                else if (file.EndsWith("shoot.png"))
+                {
+                    ProcessCustomSprite(file, 13, 4); // Recorte personalizado (2 columnas x 4 filas)
+                }
+                else if (file.EndsWith("sit.png"))
+                {
+                    ProcessCustomSprite(file, 3, 4); // Recorte personalizado (3 columnas x 4 filas)
+                }
+                else if (file.EndsWith("slash.png"))
+                {
+                    ProcessCustomSprite(file, 6, 4); // Recorte personalizado (6 columnas x 4 filas)
+                }
+                else if (file.EndsWith("spellcast.png"))
+                {
+                    ProcessCustomSprite(file, 7, 4); // Recorte personalizado (7 columnas x 4 filas)
+                }
+                else if (file.EndsWith("thrust.png"))
+                {
+                    ProcessCustomSprite(file, 8, 4); // Recorte personalizado (8 columnas x 4 filas)
+                }
+                else if (file.EndsWith("walk.png"))
+                {
+                    ProcessCustomSprite(file, 9, 4); // Recorte personalizado (2 columnas x 4 filas)
+                }
+                processedSprites++;
+            }
+
+            return processedSprites;
         }
 
-        string walkSpritePath = spritePaths[0];
-        TextureImporter importer = AssetImporter.GetAtPath(walkSpritePath) as TextureImporter;
-
-        if (importer == null)
+        // Recorte personalizado (para "standard" y "custom")
+        static void ProcessCustomSprite(string assetPath, int cols, int rows)
         {
-            Debug.LogError($"❌ No se pudo cargar el importador de la textura: {walkSpritePath}");
-            return;
+            ProcessSprite(assetPath, cols, rows);
         }
 
-        // Asegurarse de que la textura sea legible
-        importer.isReadable = true;
-        importer.SaveAndReimport();
-
-        Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(walkSpritePath).OfType<Sprite>().ToArray();
-
-        if (sprites.Length < 20)
+        // Recorte estándar o personalizado
+        static void ProcessSprite(string assetPath, int cols, int rows)
         {
-            Debug.LogError("❌ No se encontraron suficientes sprites en walk_128.png.");
-            return;
+
+            int pixelsPerUnit = 64;
+
+            TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+
+            if (importer == null)
+            {
+                Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {assetPath}");
+                return;
+            }
+
+            Debug.Log($"🛠️ Modificando sprite: {assetPath}");
+
+            // Aplicar configuración
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Multiple; // Modo múltiple para recorte en grilla
+            importer.spritePixelsPerUnit = pixelsPerUnit;
+
+            // Establecer el recorte con el número de columnas y filas específicos
+            importer.spritesheet = GenerateGridSlices(importer, cols, rows);
+
+            // Forzar reimportación
+            EditorUtility.SetDirty(importer);
+            importer.SaveAndReimport();
+
+            Debug.Log($"✅ Sprite modificado y reimportado: {assetPath}");
         }
 
-        // Obtener los sprites
-        Sprite sprite21 = sprites[21];
-        Sprite sprite25 = sprites[25];
-
-        int combinedWidth = (int)Mathf.Max(sprite21.rect.width, sprite25.rect.width);
-        int combinedHeight = (int)(sprite21.rect.height + sprite25.rect.height);
-
-        Texture2D combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false);
-
-        // Rellenar con transparente primero
-        Color[] transparentPixels = new Color[combinedWidth * combinedHeight];
-        for (int i = 0; i < transparentPixels.Length; i++)
+        // Recorte utilizando el número de columnas y filas específicos
+        static SpriteMetaData[] GenerateGridSlices(TextureImporter importer, int cols, int rows)
         {
-            transparentPixels[i] = Color.clear;
-        }
-        combinedTexture.SetPixels(transparentPixels);
+            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(importer.assetPath);
+            if (texture == null)
+            {
+                Debug.LogError($"❌ No se pudo cargar la textura: {importer.assetPath}");
+                return new SpriteMetaData[0];
+            }
 
-        // Copiar el primer sprite (parte superior)
-        combinedTexture.SetPixels(
-            0,
-            0,
-            (int)sprite21.rect.width,
-            (int)sprite21.rect.height,
-            sprite21.texture.GetPixels(
-                (int)sprite21.rect.x,
-                (int)sprite21.rect.y,
+            Debug.Log($"📏 Grid aplicado: {cols} columnas, {rows} filas en {importer.assetPath}");
+
+            SpriteMetaData[] sprites = new SpriteMetaData[cols * rows];
+
+            for (int y = 0; y < rows; y++)
+            {
+                for (int x = 0; x < cols; x++)
+                {
+                    int index = y * cols + x;
+                    sprites[index] = new SpriteMetaData
+                    {
+                        rect = new Rect(x * (texture.width / cols), texture.height - (y + 1) * (texture.height / rows), texture.width / cols, texture.height / rows),
+                        name = Path.GetFileNameWithoutExtension(importer.assetPath) + "_" + index,
+                        alignment = (int)SpriteAlignment.Center
+                    };
+                }
+            }
+
+            return sprites;
+        }
+
+        static void GenerateCombinedSprite(string folder)
+        {
+            AssetDatabase.Refresh();
+
+            string[] spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
+                                                .Select(AssetDatabase.GUIDToAssetPath)
+                                                .Where(filePath => filePath.EndsWith("walk_128.png"))
+                                                .ToArray();
+
+            if (spritePaths.Length == 0)
+            {
+                Debug.LogWarning("⚠️ No se encontró el sprite walk_128.png.");
+                return;
+            }
+
+            string walkSpritePath = spritePaths[0];
+            TextureImporter importer = AssetImporter.GetAtPath(walkSpritePath) as TextureImporter;
+
+            if (importer == null)
+            {
+                Debug.LogError($"❌ No se pudo cargar el importador de la textura: {walkSpritePath}");
+                return;
+            }
+
+            // Asegurarse de que la textura sea legible
+            importer.isReadable = true;
+            importer.SaveAndReimport();
+
+            Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(walkSpritePath).OfType<Sprite>().ToArray();
+
+            if (sprites.Length < 20)
+            {
+                Debug.LogError("❌ No se encontraron suficientes sprites en walk_128.png.");
+                return;
+            }
+
+            // Obtener los sprites
+            Sprite sprite21 = sprites[21];
+            Sprite sprite25 = sprites[25];
+
+            int combinedWidth = (int)Mathf.Max(sprite21.rect.width, sprite25.rect.width);
+            int combinedHeight = (int)(sprite21.rect.height + sprite25.rect.height);
+
+            Texture2D combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false);
+
+            // Rellenar con transparente primero
+            Color[] transparentPixels = new Color[combinedWidth * combinedHeight];
+            for (int i = 0; i < transparentPixels.Length; i++)
+            {
+                transparentPixels[i] = Color.clear;
+            }
+            combinedTexture.SetPixels(transparentPixels);
+
+            // Copiar el primer sprite (parte superior)
+            combinedTexture.SetPixels(
+                0,
+                0,
                 (int)sprite21.rect.width,
-                (int)sprite21.rect.height
-            )
-        );
+                (int)sprite21.rect.height,
+                sprite21.texture.GetPixels(
+                    (int)sprite21.rect.x,
+                    (int)sprite21.rect.y,
+                    (int)sprite21.rect.width,
+                    (int)sprite21.rect.height
+                )
+            );
 
-        // Copiar el segundo sprite (parte inferior)
-        combinedTexture.SetPixels(
-            0,
-            (int)sprite21.rect.height,
-            (int)sprite25.rect.width,
-            (int)sprite25.rect.height,
-            sprite25.texture.GetPixels(
-                (int)sprite25.rect.x,
-                (int)sprite25.rect.y,
+            // Copiar el segundo sprite (parte inferior)
+            combinedTexture.SetPixels(
+                0,
+                (int)sprite21.rect.height,
                 (int)sprite25.rect.width,
-                (int)sprite25.rect.height
-            )
-        );
+                (int)sprite25.rect.height,
+                sprite25.texture.GetPixels(
+                    (int)sprite25.rect.x,
+                    (int)sprite25.rect.y,
+                    (int)sprite25.rect.width,
+                    (int)sprite25.rect.height
+                )
+            );
 
-        combinedTexture.Apply();
+            combinedTexture.Apply();
 
-        byte[] bytes = combinedTexture.EncodeToPNG();
-        File.WriteAllBytes(Path.Combine(folder, "idle_custom.png"), bytes);
+            byte[] bytes = combinedTexture.EncodeToPNG();
+            File.WriteAllBytes(Path.Combine(folder, "idle_custom.png"), bytes);
 
-        ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2);
+            ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2);
 
-        AssetDatabase.Refresh();
-        Debug.Log("✅ Nuevo sprite combinado generado: idle_custom.png");
-    }
+            AssetDatabase.Refresh();
+            Debug.Log("✅ Nuevo sprite combinado generado: idle_custom.png");
+        }
 
-    static void ProcessAnimationFolder(string folderPath, string folderName)
-    {
-        if (!Directory.Exists(folderPath)) return;
+        static void ProcessAnimationFolder(string folderPath, string folderName)
+        {
+            if (!Directory.Exists(folderPath)) return;
 
             string[] spriteFiles = Directory.GetFiles(folderPath, "*.png");
 
@@ -567,46 +578,47 @@ public class SpriteLoader : MonoBehaviour
                     CreateAnimationClip(sprites, folderName, "walk_standard_Right", 27, 35);
                 }
             }
-    }
-    static void CreateAnimationClip(Sprite[] sprites, string folderName, string animationName, int start, int end)
-    {
-        // Asegurarse de que los índices estén dentro de los límites del array
-        start = Mathf.Clamp(start, 0, sprites.Length - 1);
-        end = Mathf.Clamp(end, 0, sprites.Length - 1);
-
-        // Verifica que el rango no sea inválido
-        if (start >= end)
-        {
-            Debug.LogWarning($"Rango inválido para la animación: {animationName} ({start}-{end})");
-            return;
         }
-
-        AnimationClip clip = new AnimationClip();
-        clip.frameRate = 12; // 12 fotogramas por segundo
-
-        EditorCurveBinding spriteBinding = new EditorCurveBinding
+        static void CreateAnimationClip(Sprite[] sprites, string folderName, string animationName, int start, int end)
         {
-            type = typeof(SpriteRenderer),
-            path = "",
-            propertyName = "m_Sprite"
-        };
+            string animationFolderPath = Path.Combine("Assets/Animations", folderName);
 
-        ObjectReferenceKeyframe[] keyframes = new ObjectReferenceKeyframe[end - start + 1];
-        for (int i = start; i <= end; i++)
-        {
-            keyframes[i - start] = new ObjectReferenceKeyframe { time = (i - start) / clip.frameRate, value = sprites[i] };
+            string animationPath = Path.Combine(animationFolderPath, animationName + ".anim");
+
+            // Asegurarse de que los índices estén dentro de los límites del array
+            start = Mathf.Clamp(start, 0, sprites.Length - 1);
+            end = Mathf.Clamp(end, 0, sprites.Length - 1);
+
+            // Verifica que el rango no sea inválido
+            if (start >= end)
+            {
+                Debug.LogWarning($"Rango inválido para la animación: {animationName} ({start}-{end})");
+                return;
+            }
+
+            AnimationClip clip = new AnimationClip();
+            clip.frameRate = 12; // 12 fotogramas por segundo
+
+            EditorCurveBinding spriteBinding = new EditorCurveBinding
+            {
+                type = typeof(SpriteRenderer),
+                path = "",
+                propertyName = "m_Sprite"
+            };
+
+            ObjectReferenceKeyframe[] keyframes = new ObjectReferenceKeyframe[end - start + 1];
+            for (int i = start; i <= end; i++)
+            {
+                keyframes[i - start] = new ObjectReferenceKeyframe { time = (i - start) / clip.frameRate, value = sprites[i] };
+            }
+
+            animationPath = CheckAndCorrectPath(animationPath);
+
+            Debug.Log($"Creando animación: {animationPath}");
+
+            AssetDatabase.CreateAsset(clip, animationPath);
+            Debug.Log($"Animación generada: {animationPath}");
         }
-
-        AnimationUtility.SetObjectReferenceCurve(clip, spriteBinding, keyframes);
-
-        string animationPath = Path.Combine("Assets/Animations", folderName, animationName + ".anim");
-
-        animationPath = CheckAndCorrectPath(animationPath);
-
-        Debug.Log($"Creando animación: {animationPath}");
-
-        AssetDatabase.CreateAsset(clip, animationPath);
-        Debug.Log($"Animación generada: {animationPath}");
     }
 
     public static string CheckAndCorrectPath(string originalPath)
@@ -614,17 +626,57 @@ public class SpriteLoader : MonoBehaviour
         // Reemplazar las barras invertidas por barras diagonales
         string correctedPath = originalPath.Replace("\\", "/");
 
-        // Verificar si el archivo existe
-        if (File.Exists(correctedPath))
-        {
-            Debug.Log("✅ El archivo existe en la ruta: " + correctedPath);
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se encontró el archivo en la ruta: " + correctedPath);
-        }
-
         return correctedPath;
+    }
+
+    static void CreateController(string folderName)
+    {
+        string animationFolderPath = Path.Combine("Assets/Sprites", folderName);
+
+        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(animationFolderPath);
+
+        controller.AddParameter("IsDead", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsMovingLeft", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsMovingRight", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsMovingUp", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsMovingDown", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsAttackingRight", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsAttackingLeft", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsAttackingDown", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsAttackingUp", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter("IsIdle", AnimatorControllerParameterType.Trigger);
+
+        AnimatorControllerLayer layer = controller.layers[0];
+        AnimatorStateMachine stateMachine = layer.stateMachine;
+
+        AnimatorState idleState = stateMachine.AddState("IdleAnimation");
+        AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation");
+        AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown");
+        AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp");
+        AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft");
+        AnimatorState slashDownState = stateMachine.AddState("Slash_Down");
+        AnimatorState slashUpState = stateMachine.AddState("Slash_Up");
+        AnimatorState slashLeftState = stateMachine.AddState("Slash_Left");
+        AnimatorState slashRightState = stateMachine.AddState("Slash_Right");
+        AnimatorState deadState = stateMachine.AddState("IdDead");
+
+        stateMachine.defaultState = idleState;
+    }
+
+    void CreatePrefab(string spriteName, Sprite sprite, string animationFolderPath)
+    {
+        GameObject spriteObject = new GameObject(spriteName);
+        SpriteRenderer renderer = spriteObject.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+
+        Animator animator = spriteObject.AddComponent<Animator>();
+        AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"{animationFolderPath}/{spriteName}.anim");
+        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath($"{animationFolderPath}/{spriteName}.controller");
+        controller.AddMotion(clip);
+        animator.runtimeAnimatorController = controller;
+
+        PrefabUtility.SaveAsPrefabAsset(spriteObject, $"{savePath}{spriteName}.prefab");
+        Destroy(spriteObject);
     }
 
 
@@ -648,7 +700,7 @@ public class SpriteLoader : MonoBehaviour
     }
     void CreateFolderAnimation(string folderName)
     {
-        string folderPath = $"Assets/Animation/{folderName}";
+        string folderPath = $"Assets/Animations/{folderName}";
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

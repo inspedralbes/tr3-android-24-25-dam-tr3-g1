@@ -21,7 +21,6 @@ public class SpriteLoader : MonoBehaviour
 
     public string spriteServerUrl = "http://localhost:4000/sprites";
     string assetBundlePath = "Assets/AssetBundles/";
-    string savePath = "Assets/Prefabs/";
 
     IEnumerator LoadSpritesFromServer()
     {
@@ -57,22 +56,23 @@ public class SpriteLoader : MonoBehaviour
                 foreach (string spritePath in spritePaths)
                 {
                     Debug.Log($"🔽 Descargando sprite: {spritePath}");
-                    DownloadSprite(spritePath, folderName);
+                    yield return StartCoroutine(DownloadSprite(spritePath, folderName));
                 }
                 string folderPath = Path.Combine("Assets/Sprites", folderName);
                 GenerateCombinedSprite(folderPath);
                 ProcessFolder(folderPath);
                 ProcessAnimationFolder(folderPath, folderName);
-                //CreateController(folderName);
+                CreateController(folderName);
+                CreatePrefab(folderName);
             }
+            // Destruir el GameObject temporal después de completar la coroutine
+
+            DestroyImmediate(gameObject);
         }
-
-        // Destruir el GameObject temporal después de completar la coroutine
-
-        DestroyImmediate(gameObject);
 
         IEnumerator DownloadSprite(string url, string folderName)
         {
+            Debug.Log($"Iniciando descarga del sprite desde: {url}");
 
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
@@ -84,11 +84,15 @@ public class SpriteLoader : MonoBehaviour
                     yield break;
                 }
 
+                Debug.Log("✅ Sprite descargado exitosamente");
+
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
                 byte[] bytes = texture.EncodeToPNG();
 
                 string fileName = Path.GetFileName(url);
                 string filePath = Path.Combine("Assets/Sprites", folderName, fileName);
+
+                Debug.Log($"Guardando sprite en: {filePath}");
 
                 File.WriteAllBytes(filePath, bytes);
                 Debug.Log($"✅ Sprite descargado y guardado en: {filePath}");
@@ -579,12 +583,9 @@ public class SpriteLoader : MonoBehaviour
                 }
             }
         }
-        static void CreateAnimationClip(Sprite[] sprites, string folderName, string animationName, int start, int end)
+        static void CreateAnimationClip(Sprite[] sprites, string folderPath, string animationName, int start, int end)
         {
-            string animationFolderPath = Path.Combine("Assets/Animations", folderName);
-
-            string animationPath = Path.Combine(animationFolderPath, animationName + ".anim");
-
+            Debug.Log($"Creando animación: {animationName} ({start}-{end})");
             // Asegurarse de que los índices estén dentro de los límites del array
             start = Mathf.Clamp(start, 0, sprites.Length - 1);
             end = Mathf.Clamp(end, 0, sprites.Length - 1);
@@ -612,9 +613,13 @@ public class SpriteLoader : MonoBehaviour
                 keyframes[i - start] = new ObjectReferenceKeyframe { time = (i - start) / clip.frameRate, value = sprites[i] };
             }
 
-            animationPath = CheckAndCorrectPath(animationPath);
+            AnimationUtility.SetObjectReferenceCurve(clip, spriteBinding, keyframes);
 
-            Debug.Log($"Creando animación: {animationPath}");
+            string animationPath = Path.Combine("Assets/Animations", folderPath, animationName + ".anim");
+
+            animationName = CheckAndCorrectPath(animationPath);
+
+            Debug.Log($"Guardando animación en: {animationPath}");
 
             AssetDatabase.CreateAsset(clip, animationPath);
             Debug.Log($"Animación generada: {animationPath}");
@@ -631,10 +636,12 @@ public class SpriteLoader : MonoBehaviour
 
     static void CreateController(string folderName)
     {
-        string animationFolderPath = Path.Combine("Assets/Sprites", folderName);
+        string controllersFolderPath = Path.Combine("Assets/Animations", folderName, $"{folderName}.controller");
+        controllersFolderPath = CheckAndCorrectPath(controllersFolderPath);
 
-        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(animationFolderPath);
+        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(controllersFolderPath);
 
+        // Parámetros del animador
         controller.AddParameter("IsDead", AnimatorControllerParameterType.Trigger);
         controller.AddParameter("IsMovingLeft", AnimatorControllerParameterType.Trigger);
         controller.AddParameter("IsMovingRight", AnimatorControllerParameterType.Trigger);
@@ -649,34 +656,135 @@ public class SpriteLoader : MonoBehaviour
         AnimatorControllerLayer layer = controller.layers[0];
         AnimatorStateMachine stateMachine = layer.stateMachine;
 
-        AnimatorState idleState = stateMachine.AddState("IdleAnimation");
-        AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation");
-        AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown");
-        AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp");
-        AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft");
-        AnimatorState slashDownState = stateMachine.AddState("Slash_Down");
-        AnimatorState slashUpState = stateMachine.AddState("Slash_Up");
-        AnimatorState slashLeftState = stateMachine.AddState("Slash_Left");
-        AnimatorState slashRightState = stateMachine.AddState("Slash_Right");
-        AnimatorState deadState = stateMachine.AddState("IdDead");
+        // Declaración de clips de animación
+        AnimationClip idleClip, walkRightClip, walkDownClip, walkUpClip, walkLeftClip;
+        AnimationClip slashDownClip, slashUpClip, slashLeftClip, slashRightClip, deadClip;
 
+        // Cargar animaciones con comprobaciones
+        if (File.Exists($"Assets/Sprites/{folderName}/idle_custom.png"))
+        {
+            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/idle_custom.anim");
+        }
+        else
+        {
+            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/idle_standard.anim");
+        }
+
+        if (File.Exists($"Assets/Sprites/{folderName}/walk_128.png"))
+        {
+            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Right.anim");
+            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Down.anim");
+            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Up.anim");
+            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Left.anim");
+        }
+        else
+        {
+            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Right.anim");
+            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Down.anim");
+            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Up.anim");
+            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Left.anim");
+        }
+
+        slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_128_Down.anim");
+        slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Up.anim");
+        slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Left.anim");
+        slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Right.anim");
+        deadClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/hurt_standard.anim");
+
+        // Crear estados
+        AnimatorState idleState = stateMachine.AddState("IdleAnimation");
+        idleState.motion = idleClip;
         stateMachine.defaultState = idleState;
+
+        AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation");
+        walkRightState.motion = walkRightClip;
+        AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown");
+        walkDownState.motion = walkDownClip;
+        AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp");
+        walkUpState.motion = walkUpClip;
+        AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft");
+        walkLeftState.motion = walkLeftClip;
+        AnimatorState slashDownState = stateMachine.AddState("Slash_Down");
+        slashDownState.motion = slashDownClip;
+        AnimatorState slashUpState = stateMachine.AddState("Slash_Up");
+        slashUpState.motion = slashUpClip;
+        AnimatorState slashLeftState = stateMachine.AddState("Slash_Left");
+        slashLeftState.motion = slashLeftClip;
+        AnimatorState slashRightState = stateMachine.AddState("Slash_Right");
+        slashRightState.motion = slashRightClip;
+        AnimatorState deadState = stateMachine.AddState("IsDead");
+        deadState.motion = deadClip;
+
+        // Transiciones desde Idle
+        idleState.AddTransition(walkRightState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingRight");
+        idleState.AddTransition(walkDownState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingDown");
+        idleState.AddTransition(walkUpState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingUp");
+        idleState.AddTransition(walkLeftState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingLeft");
+
+        // Transiciones desde Any State
+        AnimatorStateTransition anyToDead = stateMachine.AddAnyStateTransition(deadState);
+        anyToDead.AddCondition(AnimatorConditionMode.If, 0, "IsDead");
+
+        AnimatorStateTransition anyToSlashDown = stateMachine.AddAnyStateTransition(slashDownState);
+        anyToSlashDown.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingDown");
+
+        AnimatorStateTransition anyToSlashUp = stateMachine.AddAnyStateTransition(slashUpState);
+        anyToSlashUp.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingUp");
+
+        AnimatorStateTransition anyToSlashLeft = stateMachine.AddAnyStateTransition(slashLeftState);
+        anyToSlashLeft.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingLeft");
+
+        AnimatorStateTransition anyToSlashRight = stateMachine.AddAnyStateTransition(slashRightState);
+        anyToSlashRight.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingRight");
+
+        Debug.Log("Animator Controller creado en: " + controllersFolderPath);
     }
 
-    void CreatePrefab(string spriteName, Sprite sprite, string animationFolderPath)
+    void CreatePrefab(string folderName)
     {
-        GameObject spriteObject = new GameObject(spriteName);
-        SpriteRenderer renderer = spriteObject.AddComponent<SpriteRenderer>();
-        renderer.sprite = sprite;
+        Debug.Log("Creando prefab...");
+        // Crear el GameObject
+        GameObject character = new GameObject(folderName);
 
-        Animator animator = spriteObject.AddComponent<Animator>();
-        AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"{animationFolderPath}/{spriteName}.anim");
-        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath($"{animationFolderPath}/{spriteName}.controller");
-        controller.AddMotion(clip);
-        animator.runtimeAnimatorController = controller;
+        // Añadir componentes
+        Transform transform = character.GetComponent<Transform>();
+        SpriteRenderer spriteRenderer = character.AddComponent<SpriteRenderer>();
+        MonoBehaviour monoBehaviour = character.AddComponent<Tile>();
+        Animator animator = character.AddComponent<Animator>();
 
-        PrefabUtility.SaveAsPrefabAsset(spriteObject, $"{savePath}{spriteName}.prefab");
-        Destroy(spriteObject);
+        // Configurar Transform
+        transform.localPosition = new Vector3(-1.86f, 2.21f, 0);
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = new Vector3(1, 1, 1);
+
+        // Configurar SpriteRenderer
+        if (File.Exists($"Assets/Sprites/{folderName}/idle_custom.png"))
+        {
+            spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Sprites/{folderName}/idle_custom.png");
+        }
+        else
+        {
+            spriteRenderer.sprite = AssetDatabase.LoadAllAssetsAtPath($"Assets/Sprites/{folderName}/idle.png").OfType<Sprite>().ToArray()[4];
+        }
+
+        // Configurar Animator
+        animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>($"Assets/Animations/{folderName}/{folderName}.controller");
+
+        // Crear la carpeta Prefabs si no existe
+        string prefabFolderPath = "Assets/Prefabs";
+        if (!Directory.Exists(prefabFolderPath))
+        {
+            Directory.CreateDirectory(prefabFolderPath);
+        }
+
+        // Guardar el prefab
+        string prefabPath = Path.Combine(prefabFolderPath, $"{folderName}.prefab");
+        PrefabUtility.SaveAsPrefabAsset(character, prefabPath);
+
+        // Destruir el GameObject temporal
+        DestroyImmediate(character);
+
+        Debug.Log("Prefab creado en: " + prefabPath);
     }
 
 

@@ -1,175 +1,97 @@
-//using UnityEngine;
-//using UnityEditor;
-//using UnityEditor.Animations;
-//using System.IO;
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Text.RegularExpressions;
 
-//public class CreatePrefabs
-//{
-//    [MenuItem("Tools/Create Prefabs From Sprites")]
-//    public static void CreatePrefabsFromSprites()
-//    {
-//        string spritesBasePath = "Assets/Sprites"; // Carpeta base de los sprites
-//        string prefabsBasePath = "Assets/Prefabs"; // Carpeta base de los prefabs
+public class AutoAssetBundleCreator : MonoBehaviour
+{
+    [MenuItem("Tools/Generar AssetBundles Automáticos")]
+    static void CrearAssetBundlesPorPrefab()
+    {
+        // Directorio donde se encuentran los prefabs
+        string prefabDirectory = "Assets/Prefabs";
 
-//        // Obtener todas las carpetas dentro de Sprites
-//        string[] spriteDirectories = Directory.GetDirectories(spritesBasePath);
+        // Directorio donde se guardarán los AssetBundles
+        string assetBundleDirectory = "Assets/AssetBundles";
 
-//        foreach (string spriteDir in spriteDirectories)
-//        {
-//            string folderName = Path.GetFileName(spriteDir);
-//            string standardAnimsPath = Path.Combine("Assets", folderName, "standard"); // Ruta a las animaciones estándar
-//            string customAnimsPath = Path.Combine("Assets", folderName, "custom"); // Ruta a las animaciones personalizadas
-//            string prefabsPath = Path.Combine(prefabsBasePath, folderName);
+        // Crear el directorio de AssetBundles si no existe
+        if (!Directory.Exists(assetBundleDirectory))
+        {
+            Directory.CreateDirectory(assetBundleDirectory);
+        }
 
-//            if (!Directory.Exists(prefabsPath))
-//                Directory.CreateDirectory(prefabsPath);
+        // Obtener todos los prefabs en el directorio
+        string[] prefabPaths = Directory.GetFiles(prefabDirectory, "*.prefab", SearchOption.AllDirectories);
 
-//            // Obtener las rutas de animación y asignarlas dependiendo de la carpeta
-//            string idleClipPath = Path.Combine(customAnimsPath, "idle_custom.anim");
-//            if (!File.Exists(idleClipPath))
-//            {
-//                idleClipPath = Path.Combine(standardAnimsPath, "idle_standard_Down.anim");
-//            }
+        foreach (var prefabPath in prefabPaths)
+        {
+            // Asegurarnos de que estamos usando rutas de assets que comienzan desde "Assets"
+            if (!prefabPath.StartsWith(Application.dataPath))
+            {
+                Debug.LogError($"Ruta inválida para prefab: {prefabPath}");
+                continue;
+            }
 
-//            string walkUpClipPath = Path.Combine(customAnimsPath, "walk_Up.anim");
-//            if (!File.Exists(walkUpClipPath))
-//            {
-//                walkUpClipPath = Path.Combine(standardAnimsPath, "walk_standard_Up.anim");
-//            }
+            // Convertir la ruta para usar barras normales
+            string assetPath = "Assets" + prefabPath.Substring(Application.dataPath.Length).Replace("\\", "/");
 
-//            string walkDownClipPath = Path.Combine(customAnimsPath, "walk_Down.anim");
-//            if (!File.Exists(walkDownClipPath))
-//            {
-//                walkDownClipPath = Path.Combine(standardAnimsPath, "walk_standard_Down.anim");
-//            }
+            // Limpiar el nombre del prefab, eliminando caracteres no válidos
+            string prefabName = Path.GetFileNameWithoutExtension(prefabPath);
+            prefabName = CleanFileName(prefabName);
 
-//            string walkLeftClipPath = Path.Combine(customAnimsPath, "walk_Left.anim");
-//            if (!File.Exists(walkLeftClipPath))
-//            {
-//                walkLeftClipPath = Path.Combine(standardAnimsPath, "walk_standard_Left.anim");
-//            }
+            // Cargar el prefab
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            if (prefab == null)
+            {
+                Debug.LogError($"No se pudo cargar el prefab en la ruta: {prefabPath}");
+                continue;
+            }
 
-//            string walkRightClipPath = Path.Combine(customAnimsPath, "walk_Right.anim");
-//            if (!File.Exists(walkRightClipPath))
-//            {
-//                walkRightClipPath = Path.Combine(standardAnimsPath, "walk_standard_Right.anim");
-//            }
+            // Obtener todas las dependencias del prefab (sprites, animadores, materiales, animaciones, etc.)
+            string[] dependencias = AssetDatabase.GetDependencies(new string[] { assetPath });
 
-//            string attackUpClipPath = Path.Combine(customAnimsPath, sprite.name + "_AttackUp.anim");
-//            if (!File.Exists(attackUpClipPath))
-//            {
-//                attackUpClipPath = Path.Combine(standardAnimsPath, sprite.name + "_AttackUp.anim");
-//            }
+            // Asignar cada dependencia al mismo AssetBundle
+            string assetBundleName = prefabName.ToLower();  // El nombre del AssetBundle será el nombre del prefab
 
-//            string attackDownClipPath = Path.Combine(customAnimsPath, sprite.name + "_AttackDown.anim");
-//            if (!File.Exists(attackDownClipPath))
-//            {
-//                attackDownClipPath = Path.Combine(standardAnimsPath, sprite.name + "_AttackDown.anim");
-//            }
+            foreach (string dependencia in dependencias)
+            {
+                // Excluir scripts (.cs)
+                if (dependencia.EndsWith(".cs"))
+                {
+                    continue;
+                }
 
-//            string attackLeftClipPath = Path.Combine(customAnimsPath, sprite.name + "_AttackLeft.anim");
-//            if (!File.Exists(attackLeftClipPath))
-//            {
-//                attackLeftClipPath = Path.Combine(standardAnimsPath, sprite.name + "_AttackLeft.anim");
-//            }
+                string dependenciaPath = dependencia.Replace("\\", "/");
+                if (dependenciaPath.EndsWith(".meta")) continue;  // Ignorar archivos .meta
 
-//            string attackRightClipPath = Path.Combine(customAnimsPath, sprite.name + "_AttackRight.anim");
-//            if (!File.Exists(attackRightClipPath))
-//            {
-//                attackRightClipPath = Path.Combine(standardAnimsPath, sprite.name + "_AttackRight.anim");
-//            }
+                // Asignar el nombre del AssetBundle a cada dependencia
+                AssetImporter assetImporter = AssetImporter.GetAtPath(dependencia);
+                if (assetImporter != null)
+                {
+                    assetImporter.assetBundleName = assetBundleName;
+                    Debug.Log($"Asignado AssetBundle: {dependencia} -> {assetBundleName}");
+                }
+            }
 
-//            // Ahora asignamos las rutas a las animaciones en el diccionario
-//            var animationPaths = new System.Collections.Generic.Dictionary<string, string>
-//            {
-//                { "Idle", idleClipPath },
-//                { "WalkUp", walkUpClipPath },
-//                { "WalkDown", walkDownClipPath },
-//                { "WalkLeft", walkLeftClipPath },
-//                { "WalkRight", walkRightClipPath },
-//                { "AttackUp", attackUpClipPath },
-//                { "AttackDown", attackDownClipPath },
-//                { "AttackLeft", attackLeftClipPath },
-//                { "AttackRight", attackRightClipPath }
-//            };
+            // Crear AssetBundle para el prefab y sus dependencias
+            Debug.Log($"Creando AssetBundle para el prefab: {prefabName}");
+        }
 
-//            // Obtener todos los sprites en la carpeta actual
-//            string[] spriteFiles = Directory.GetFiles(spriteDir, "*.png", SearchOption.AllDirectories);
+        // Construir todos los AssetBundles
+        BuildAssetBundles(assetBundleDirectory);
+    }
 
-//            foreach (string spriteFile in spriteFiles)
-//            {
-//                string assetPath = spriteFile.Replace(Application.dataPath, "Assets");
-//                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+    // Método para limpiar el nombre de archivo, eliminando caracteres no válidos
+    static string CleanFileName(string fileName)
+    {
+        // Reemplazar cualquier carácter no alfanumérico o especial por un guion bajo
+        return Regex.Replace(fileName, @"[^a-zA-Z0-9_]", "_");
+    }
 
-//                if (sprite != null)
-//                {
-//                    // Crear GameObject
-//                    GameObject newPrefab = new GameObject(sprite.name);
-//                    SpriteRenderer spriteRenderer = newPrefab.AddComponent<SpriteRenderer>();
-//                    spriteRenderer.sprite = sprite;
-
-//                    // Añadir Animator
-//                    Animator animator = newPrefab.AddComponent<Animator>();
-//                    string controllerPath = Path.Combine(standardAnimsPath, sprite.name + "_Controller.controller");
-//                    AnimatorController animatorController = AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-//                    animator.runtimeAnimatorController = animatorController;
-
-//                    // Crear estados y parámetros
-//                    AnimatorStateMachine rootStateMachine = animatorController.layers[0].stateMachine;
-//                    foreach (var entry in animationPaths)
-//                    {
-//                        string stateName = entry.Key;
-//                        string standardClipPath = Path.Combine(standardAnimsPath, sprite.name + "_" + stateName + ".anim");
-//                        string customClipPath = Path.Combine(customAnimsPath, sprite.name + "_" + stateName + ".anim");
-//                        AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(customClipPath) ??
-//                                            AssetDatabase.LoadAssetAtPath<AnimationClip>(standardClipPath);
-
-//                        if (clip != null)
-//                        {
-//                            AnimatorState state = rootStateMachine.AddState(stateName);
-//                            state.motion = clip;
-//                        }
-//                        else
-//                        {
-//                            Debug.LogWarning($"No se encontró la animación en Standard ni en Custom: {stateName} para {sprite.name}");
-//                        }
-//                    }
-
-//                    // Agregar transitions desde AnyState con triggers
-//                    foreach (var entry in animationPaths)
-//                    {
-//                        AnimatorState targetState = FindState(rootStateMachine, entry.Key);
-//                        if (targetState != null)
-//                        {
-//                            AnimatorStateTransition transition = rootStateMachine.AddAnyStateTransition(targetState);
-//                            transition.AddCondition(AnimatorConditionMode.If, 0, entry.Key);
-//                            transition.hasExitTime = false;
-//                        }
-//                    }
-
-//                    // Guardar el GameObject como un prefab
-//                    string prefabPath = Path.Combine(prefabsPath, sprite.name + ".prefab");
-//                    PrefabUtility.SaveAsPrefabAsset(newPrefab, prefabPath);
-
-//                    // Destruir GameObject temporal
-//                    GameObject.DestroyImmediate(newPrefab);
-//                }
-//            }
-//        }
-
-//        // Refrescar la base de datos de assets
-//        AssetDatabase.Refresh();
-//    }
-
-//    private static AnimatorState FindState(AnimatorStateMachine stateMachine, string stateName)
-//    {
-//        foreach (var state in stateMachine.states)
-//        {
-//            if (state.state.name == stateName)
-//            {
-//                return state.state;
-//            }
-//        }
-//        return null;
-//    }
-//}
+    static void BuildAssetBundles(string assetBundleDirectory)
+    {
+        // Construir AssetBundles para todos los recursos asignados a AssetBundles
+        BuildPipeline.BuildAssetBundles(assetBundleDirectory, BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
+        Debug.Log("AssetBundles creados correctamente.");
+    }
+}

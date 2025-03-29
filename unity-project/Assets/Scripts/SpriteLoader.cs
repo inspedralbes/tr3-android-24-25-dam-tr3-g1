@@ -7,6 +7,8 @@ using System.IO;
 using UnityEditor.Animations;
 using System.Linq;
 using UnityEditor;
+using System.Net.Http;
+using System;
 
 public class SpriteLoader : MonoBehaviour
 {
@@ -30,7 +32,9 @@ public class SpriteLoader : MonoBehaviour
         instance.StartCoroutine(instance.LoadSpritesFromServer());
     }
 
+    public string characterListUrl = "http://localhost:4000/characters";
     public string spriteServerUrl = "http://localhost:4000/sprites";
+
     string assetBundlePath = "Assets/AssetBundles/";
 
     IEnumerator LoadSpritesFromServer()
@@ -72,8 +76,9 @@ public class SpriteLoader : MonoBehaviour
                 string folderPath = Path.Combine("Assets/Sprites", folderName);
                 GenerateCombinedSprite(folderPath);
                 ProcessFolder(folderPath);
+                ResizeSpritesInFolder(folderPath, 64);
                 ProcessAnimationFolder(folderPath, folderName);
-                CreateController(folderName);
+                CreateController(folderName, characterListUrl);
                 CreatePrefab(folderName);
                 // CrearAssetBundle(folderName);
             }
@@ -104,6 +109,7 @@ public class SpriteLoader : MonoBehaviour
 
                 string fileName = Path.GetFileName(url);
                 string filePath = Path.Combine("Assets/Sprites", folderName, fileName);
+                filePath = CheckAndCorrectPath(filePath);
 
                 Debug.Log($"Guardando sprite en: {filePath}");
 
@@ -308,15 +314,19 @@ public class SpriteLoader : MonoBehaviour
         {
             AssetDatabase.Refresh();
 
-            string[] spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
+            string[] spritePaths;
+
+            spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
                                                 .Select(AssetDatabase.GUIDToAssetPath)
                                                 .Where(filePath => filePath.EndsWith("walk_128.png"))
                                                 .ToArray();
 
             if (spritePaths.Length == 0)
             {
-                Debug.LogWarning("⚠️ No se encontró el sprite walk_128.png.");
-                return;
+                spritePaths = AssetDatabase.FindAssets("t:Texture2D", new[] { folder })
+                                                .Select(AssetDatabase.GUIDToAssetPath)
+                                                .Where(filePath => filePath.EndsWith("walk.png"))
+                                                .ToArray();
             }
 
             string walkSpritePath = spritePaths[0];
@@ -390,10 +400,42 @@ public class SpriteLoader : MonoBehaviour
             byte[] bytes = combinedTexture.EncodeToPNG();
             File.WriteAllBytes(Path.Combine(folder, "idle_custom.png"), bytes);
 
-            ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2);
+            ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2); // Recorte personalizado (1 columna x 2 filas)
 
             AssetDatabase.Refresh();
             Debug.Log("✅ Nuevo sprite combinado generado: idle_custom.png");
+        }
+
+        static void ResizeSpritesInFolder(string folderPath, int targetSize)
+        {
+            string[] files = AssetDatabase.FindAssets("t:Texture2D", new[] { folderPath })
+                                .Select(AssetDatabase.GUIDToAssetPath)
+                                .Where(filePath => filePath.EndsWith(".png"))
+                                .ToArray();
+
+            if (files.Length == 0)
+            {
+                Debug.Log($"⚠️ No se encontraron imágenes en: {folderPath}");
+                return;
+            }
+
+            foreach (string file in files)
+            {
+                TextureImporter importer = AssetImporter.GetAtPath(file) as TextureImporter;
+                if (importer == null)
+                {
+                    Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {file}");
+                    continue;
+                }
+
+                importer.spritePixelsPerUnit = targetSize;
+                EditorUtility.SetDirty(importer);
+                importer.SaveAndReimport();
+
+                Debug.Log($"✅ Sprite redimensionado a {targetSize}px: {file}");
+            }
+
+            AssetDatabase.Refresh();
         }
 
         static void ProcessAnimationFolder(string folderPath, string folderName)
@@ -647,8 +689,42 @@ public class SpriteLoader : MonoBehaviour
         return correctedPath;
     }
 
-    static void CreateController(string folderName)
+    static async Task<List<Character>> GetCharacterListAsync(string url)
     {
+        using (HttpClient client = new HttpClient())
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                CharacterListWrapper characterListWrapper = JsonUtility.FromJson<CharacterListWrapper>("{\"characters\":" + jsonResponse + "}");
+                return characterListWrapper.characters;
+            }
+            else
+            {
+                Debug.LogError("❌ Error al obtener la lista de personajes: " + response.ReasonPhrase);
+                return null;
+            }
+        }
+    }
+
+    static async void CreateController(string folderName, string characterListUrl)
+    {
+        Character Personaje = null;
+        List<Character> characters = await GetCharacterListAsync(characterListUrl);
+
+        if (characters == null)
+        {
+            Debug.LogError("❌ No se pudo obtener la lista de personajes.");
+            return;
+        }
+
+        List<(string name, string weapon)> characterNamesAndWeapons = characters.Select(c => (c.name, c.weapon)).ToList();
+
+        Personaje = characters.Find(c => c.name == folderName);
+
+        Debug.Log($"👤 Personaje {Personaje.id} encontrado: {Personaje.name} con arma: {Personaje.weapon}");
+
         string controllersFolderPath = Path.Combine("Assets/Animations", folderName, $"{folderName}.controller");
         controllersFolderPath = CheckAndCorrectPath(controllersFolderPath);
 
@@ -669,7 +745,6 @@ public class SpriteLoader : MonoBehaviour
         AnimatorControllerLayer layer = controller.layers[0];
         AnimatorStateMachine stateMachine = layer.stateMachine;
 
-
         AnimationClip idleClip, idleNewClip, walkRightClip, walkDownClip, walkUpClip, walkLeftClip;
         AnimationClip slashDownClip, slashUpClip, slashLeftClip, slashRightClip, deadClip;
 
@@ -684,7 +759,6 @@ public class SpriteLoader : MonoBehaviour
             idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_idle_standard_Down.anim");
             Debug.Log("Use Standard IDLE");
         }
-
 
         idleNewClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_idle_new.anim");
 
@@ -703,10 +777,45 @@ public class SpriteLoader : MonoBehaviour
             walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_standard_Left.anim");
         }
 
-        slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Down.anim");
-        slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Up.anim");
-        slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Left.anim");
-        slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Right.anim");
+        if (Personaje.weapon.Equals("SWORD"))
+        {
+            Debug.Log("Use Oversize SLASH");
+            slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_oversize_Down.anim");
+            slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_oversize_Up.anim");
+            slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_oversize_Left.anim");
+            slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_oversize_Right.anim");
+        }
+        else if (Personaje.weapon.Equals("AXE"))
+        {
+            Debug.Log("Use Reverse SLASH");
+            slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Down.anim");
+            slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Up.anim");
+            slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Left.anim");
+            slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Right.anim");
+        }
+        else if (Personaje.weapon.Equals("BOW")) 
+        {
+            Debug.Log("Use Standard SHOOT");
+            slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Down.anim");
+            slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Up.anim");
+            slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Left.anim");
+            slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Right.anim");
+        }
+        else if (Personaje.weapon.Equals("MAGIC") || (Personaje.weapon.Equals("SPEAR")))
+        {
+            Debug.Log("Use Standard SPELLCAST");
+            slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_thrust_oversize_Down.anim");
+            slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_thrust_oversize_Up.anim");
+            slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_thrust_oversize_Left.anim");
+            slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_thrust_oversize_Right.anim");
+        }
+        else
+        {
+            slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_standard_Down.anim");
+            slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_standard_Up.anim");
+            slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_standard_Left.anim");
+            slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_standard_Right.anim");
+        }
 
         deadClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_hurt_standard.anim");
 
@@ -722,52 +831,49 @@ public class SpriteLoader : MonoBehaviour
         SetClipToLoop(slashRightClip);
         SetClipToLoop(deadClip);
 
-
         // Crear estados
         AnimatorState idleState = stateMachine.AddState("IdleAnimation", new Vector3(70, 90, 0));
         idleState.motion = idleClip;
-        idleState.speed = 0.5f; // Asegura que el "Idle" se repita (looping)
+        idleState.speed = 0.3f;
         stateMachine.defaultState = idleState;
 
         AnimatorState idleNewState = stateMachine.AddState("IdleNewStatus", new Vector3(70, 140, 0));
         idleNewState.motion = idleNewClip;
-        idleNewState.speed = 1f; // Asegura que el "IdleNewStatus" se repita (looping)
+        idleNewState.speed = 1f;
 
         AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation", new Vector3(580, -140, 0));
         walkRightState.motion = walkRightClip;
-        walkRightState.speed = 1f; // Repetir el caminar a la derecha en bucle
+        walkRightState.speed = 1f;
 
         AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown", new Vector3(580, -80, 0));
         walkDownState.motion = walkDownClip;
-        walkDownState.speed = 1f; // Repetir el caminar hacia abajo en bucle
+        walkDownState.speed = 1f;
 
         AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp", new Vector3(580, 30, 0));
         walkUpState.motion = walkUpClip;
-        walkUpState.speed = 1f; // Repetir el caminar hacia arriba en bucle
+        walkUpState.speed = 1f;
 
         AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft", new Vector3(580, -20, 0));
         walkLeftState.motion = walkLeftClip;
-        walkLeftState.speed = 1f; // Repetir el caminar a la izquierda en bucle
+        walkLeftState.speed = 1f;
 
         AnimatorState slashDownState = stateMachine.AddState("Slash_Down", new Vector3(580, 80, 0));
         slashDownState.motion = slashDownClip;
-        slashDownState.speed = 1f; // Repetir el ataque hacia abajo
+        slashDownState.speed = 1f;
 
         AnimatorState slashUpState = stateMachine.AddState("Slash_Up", new Vector3(580, 130, 0));
         slashUpState.motion = slashUpClip;
-        slashUpState.speed = 1f; // Repetir el ataque hacia arriba
+        slashUpState.speed = 1f;
 
         AnimatorState slashLeftState = stateMachine.AddState("Slash_Left", new Vector3(580, 180, 0));
         slashLeftState.motion = slashLeftClip;
-        slashLeftState.speed = 1f; // Repetir el ataque a la izquierda
+        slashLeftState.speed = 1f;
 
         AnimatorState slashRightState = stateMachine.AddState("Slash_Right", new Vector3(580, 230, 0));
         slashRightState.motion = slashRightClip;
-        slashRightState.speed = 1f; // Repetir el ataque a la derecha
-
+        slashRightState.speed = 1f;
         AnimatorState deadState = stateMachine.AddState("IsDead", new Vector3(580, -210, 0));
         deadState.motion = deadClip;
-
 
         // Transiciones desde Any State para todos los movimientos
         stateMachine.AddAnyStateTransition(idleState).AddCondition(AnimatorConditionMode.If, 0, "IsIdle");
@@ -810,7 +916,7 @@ public class SpriteLoader : MonoBehaviour
         // Añadir componentes
         Transform transform = character.GetComponent<Transform>();
         SpriteRenderer spriteRenderer = character.AddComponent<SpriteRenderer>();
-        MonoBehaviour monoBehaviour = character.AddComponent<Tile>();
+        CharacterManager characterManager = character.AddComponent<CharacterManager>();
         Animator animator = character.AddComponent<Animator>();
 
         // Configurar Transform
@@ -849,69 +955,13 @@ public class SpriteLoader : MonoBehaviour
 
         // Guardar el prefab
         string prefabPath = Path.Combine(prefabFolderPath, $"{folderName}.prefab");
+        prefabPath = CheckAndCorrectPath(prefabPath);
         PrefabUtility.SaveAsPrefabAsset(character, prefabPath);
 
         // Destruir el GameObject temporal
         DestroyImmediate(character);
 
         Debug.Log("Prefab creado en: " + prefabPath);
-    }
-
-    static void CrearAssetBundle(string folderName)
-    {
-        Debug.Log($"Creando AssetBundle... {folderName}");
-        // El path del prefab desde donde se tomará el asset
-        string prefabPath = $"Assets/Prefabs/{folderName}.prefab"; // Cambia esta ruta al prefab que quieres
-
-        // Cargar el prefab desde el archivo
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
-        if (prefab == null)
-        {
-            Debug.LogError("No se encontró el prefab en la ruta especificada.");
-            return;
-        }
-
-        // Obtenemos todas las dependencias del prefab (animaciones, sprites, materiales, etc.)
-        string[] dependencias = AssetDatabase.GetDependencies(new string[] { prefabPath });
-
-        // Definimos el nombre del AssetBundle
-        string assetBundleName = folderName;
-
-        // Establecer el nombre del AssetBundle para el prefab y sus dependencias
-        foreach (string dependencia in dependencias)
-        {
-            // Excluir scripts de las dependencias
-            if (dependencia.EndsWith(".cs"))
-            {
-                continue;
-            }
-
-            string assetPath = dependencia;
-            string bundlePath = "Assets/AssetBundles/" + assetBundleName;
-
-            // Cambiar el nombre del asset bundle para cada dependencia
-            AssetImporter assetImporter = AssetImporter.GetAtPath(assetPath);
-            assetImporter.assetBundleName = assetBundleName;
-        }
-
-        // Crear el directorio para guardar el AssetBundle si no existe
-        if (!System.IO.Directory.Exists("Assets/AssetBundles"))
-        {
-            System.IO.Directory.CreateDirectory("Assets/AssetBundles");
-        }
-
-        // Construir el AssetBundle en el directorio especificado
-        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
-
-        // Descargar el AssetBundle para liberar memoria
-        AssetBundle assetBundle = AssetBundle.LoadFromFile(Path.Combine("Assets/AssetBundles", assetBundleName));
-        if (assetBundle != null)
-        {
-            assetBundle.Unload(true);
-        }
-
-        Debug.Log("AssetBundle creado correctamente.");
     }
 
     void CreateFolderSprites(string folderName)
@@ -930,6 +980,37 @@ public class SpriteLoader : MonoBehaviour
             Directory.CreateDirectory(folderPath);
         }
     }
+    static void ResizeSpritesInFolder(string folderPath, int targetSize = 64)
+    {
+        string[] files = AssetDatabase.FindAssets("t:Texture2D", new[] { folderPath })
+                            .Select(AssetDatabase.GUIDToAssetPath)
+                            .Where(filePath => filePath.EndsWith(".png"))
+                            .ToArray();
+
+        if (files.Length == 0)
+        {
+            Debug.Log($"⚠️ No se encontraron imágenes en: {folderPath}");
+            return;
+        }
+
+        foreach (string file in files)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(file) as TextureImporter;
+            if (importer == null)
+            {
+                Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {file}");
+                continue;
+            }
+
+            importer.spritePixelsPerUnit = targetSize;
+            EditorUtility.SetDirty(importer);
+            importer.SaveAndReimport();
+
+            Debug.Log($"✅ Sprite redimensionado a {targetSize}px: {file}");
+        }
+
+        AssetDatabase.Refresh();
+    }
 
 
     [System.Serializable]
@@ -943,5 +1024,17 @@ public class SpriteLoader : MonoBehaviour
     private class SpriteListWrapper
     {
         public SpriteList[] spriteLists;
+    }
+    [System.Serializable]
+    public class CharacterListWrapper
+    {
+        public List<Character> characters;
+    }
+    [Serializable]
+    public class Character
+    {
+        public int id;
+        public string name;
+        public string weapon;
     }
 }

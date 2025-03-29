@@ -3,3 +3,83 @@
     -unity-font-style: bold;
     color: rgb(68, 138, 255);
 }
+
+.Title {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(68, 138, 255);
+    align-items: center;
+    top: 4%;
+    left: auto;
+    align-self: center;
+    width: 100%;
+    display: block;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.CardDisplay {
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    height: ;
+    flex-grow: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: ;
+    overflow: auto;
+    box-sizing: border-box;
+    margin-top: 50px;
+}
+
+.Card {
+    background-color: rgb(65, 154, 164);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    flex-grow: 1;
+    border: 3px solid rgb(0, 0, 0);
+    width: 20%;
+    box-sizing: border-box;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.UnitName {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.image {
+    flex-grow: 1;
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    color: rgb(68, 138, 255);
+}
+
+.BuyButton {
+    background-color: rgb(68, 138, 255);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.BackButton {
+    background-color: rgb(68, 138, 255);
+    color: rgb(255, 255, 255);
+    border-radius: 50%;
+    padding: 10px;
+    margin: 10px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

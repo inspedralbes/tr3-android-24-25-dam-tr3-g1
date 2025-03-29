@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Networking;
 using System.IO;
 using UnityEditor.Animations;
 using System.Linq;
-using UnityEditor.Overlays;
+using UnityEditor;
 
 public class SpriteLoader : MonoBehaviour
 {
@@ -15,7 +14,19 @@ public class SpriteLoader : MonoBehaviour
     static void ExecuteSprites()
     {
         GameObject tempGameObject = new GameObject("SpriteLoaderTemp");
+        if (tempGameObject == null)
+        {
+            Debug.LogError("❌ Error al crear el GameObject 'SpriteLoaderTemp'.");
+            return;
+        }
+
         SpriteLoader instance = tempGameObject.AddComponent<SpriteLoader>();
+        if (instance == null)
+        {
+            Debug.LogError("❌ Error al añadir el componente 'SpriteLoader'.");
+            return;
+        }
+
         instance.StartCoroutine(instance.LoadSpritesFromServer());
     }
 
@@ -64,10 +75,12 @@ public class SpriteLoader : MonoBehaviour
                 ProcessAnimationFolder(folderPath, folderName);
                 CreateController(folderName);
                 CreatePrefab(folderName);
+               // CrearAssetBundle(folderName);
             }
             // Destruir el GameObject temporal después de completar la coroutine
 
             DestroyImmediate(gameObject);
+            Debug.Log("FINISH");
         }
 
         IEnumerator DownloadSprite(string url, string folderName)
@@ -403,183 +416,183 @@ public class SpriteLoader : MonoBehaviour
                 //Custom
                 if (fileName.Contains("backslash_128.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "blackslash_Up_Left", 0, 6);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Up_Right", 7, 12);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Left_Left", 13, 19);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Left_Right", 20, 26);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Down_Left", 27, 32);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Down_Right", 34, 40);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Right_Left", 41, 47);
-                    CreateAnimationClip(sprites, folderName, "blackslash_Right_Right", 48, 53);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Up_Left", 0, 6);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Up_Right", 7, 12);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Left_Left", 13, 19);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Left_Right", 20, 26);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Down_Left", 27, 32);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Down_Right", 34, 40);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Right_Left", 41, 47);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_Right_Right", 48, 53);
 
                 }
                 else if (fileName.Contains("halfslash_128.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "halfslash_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "halfslash_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "halfslash_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "halfslash_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_Right", 18, 23);
                 }
                 else if (fileName.Contains("slash_128.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "slash_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "slash_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "slash_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "slash_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_Right", 18, 23);
                 }
                 else if (fileName.Contains("slash_oversize.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "slash_oversize_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "slash_oversize_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "slash_oversize_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "slash_oversize_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_oversize_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_oversize_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_oversize_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_oversize_Right", 18, 23);
                 }
                 else if (fileName.Contains("slash_reverse_oversize.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "slash_reverse_oversize_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "slash_reverse_oversize_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "slash_reverse_oversize_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "slash_reverse_oversize_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_reverse_oversize_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_reverse_oversize_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_reverse_oversize_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_reverse_oversize_Right", 18, 23);
                 }
                 else if (fileName.Contains("thrust_oversize.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "thrust_oversize_Up", 0, 7);
-                    CreateAnimationClip(sprites, folderName, "thrust_oversize_Left", 8, 15);
-                    CreateAnimationClip(sprites, folderName, "thrust_oversize_Down", 16, 23);
-                    CreateAnimationClip(sprites, folderName, "thrust_oversize_Right", 24, 31);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_oversize_Up", 0, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_oversize_Left", 8, 15);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_oversize_Down", 16, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_oversize_Right", 24, 31);
                 }
                 else if (fileName.Contains("tool_rod.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "tool_rod_Up", 0, 12);
-                    CreateAnimationClip(sprites, folderName, "tool_rod_Left", 13, 25);
-                    CreateAnimationClip(sprites, folderName, "tool_rod_Down", 26, 38);
-                    CreateAnimationClip(sprites, folderName, "tool_rod_Right", 39, 51);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_rod_Up", 0, 12);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_rod_Left", 13, 25);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_rod_Down", 26, 38);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_rod_Right", 39, 51);
                 }
                 else if (fileName.Contains("tool_whip.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "tool_whip_Up", 0, 7);
-                    CreateAnimationClip(sprites, folderName, "tool_whip_Left", 8, 15);
-                    CreateAnimationClip(sprites, folderName, "tool_whip_Down", 16, 23);
-                    CreateAnimationClip(sprites, folderName, "tool_whip_Right", 24, 31);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_whip_Up", 0, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_whip_Left", 8, 15);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_whip_Down", 16, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_tool_whip_Right", 24, 31);
                 }
                 else if (fileName.Contains("walk_128.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "walk_Up", 0, 8);
-                    CreateAnimationClip(sprites, folderName, "walk_Left", 9, 17);
-                    CreateAnimationClip(sprites, folderName, "walk_Down", 18, 26);
-                    CreateAnimationClip(sprites, folderName, "walk_Right", 27, 35);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_Up", 0, 8);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_Left", 9, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_Down", 18, 26);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_Right", 27, 35);
                 }
                 else if (fileName.Contains("wheelchair.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "wheelchair_Up", 0, 1);
-                    CreateAnimationClip(sprites, folderName, "wheelchair_Left", 2, 3);
-                    CreateAnimationClip(sprites, folderName, "wheelchair_Down", 4, 5);
-                    CreateAnimationClip(sprites, folderName, "wheelchair_Right", 6, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_wheelchair_Up", 0, 1);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_wheelchair_Left", 2, 3);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_wheelchair_Down", 4, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_wheelchair_Right", 6, 7);
                 }
                 else if (fileName.Contains("idle_custom.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "idle_custom", 0, 1);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_idle_custom", 0, 1);
                 }
                 //Standard
                 else if (fileName.Contains("backslash.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Up_Left", 0, 6);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Up_Right", 7, 12);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Left_Left", 13, 19);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Left_Right", 20, 26);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Down_Left", 27, 33);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Down_Right", 34, 40);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Right_Left", 41, 47);
-                    CreateAnimationClip(sprites, folderName, "blackslash_standard_Right_Right", 48, 53);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Up_Left", 0, 6);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Up_Right", 7, 12);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Left_Left", 13, 19);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Left_Right", 20, 26);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Down_Left", 27, 33);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Down_Right", 34, 40);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Right_Left", 41, 47);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_blackslash_standard_Right_Right", 48, 53);
 
                 }
                 else if (fileName.Contains("climb.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "climb_standard", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_climb_standard", 0, 5);
 
                 }
                 else if (fileName.Contains("combat_idle.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "combat_idle_standard_Up", 0, 1);
-                    CreateAnimationClip(sprites, folderName, "combat_idle_standard_Left", 2, 3);
-                    CreateAnimationClip(sprites, folderName, "combat_idle_standard_Down", 4, 5);
-                    CreateAnimationClip(sprites, folderName, "combat_idle_standard_Right", 6, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_combat_idle_standard_Up", 0, 1);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_combat_idle_standard_Left", 2, 3);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_combat_idle_standard_Down", 4, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_combat_idle_standard_Right", 6, 7);
                 }
                 else if (fileName.Contains("emote.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "emote_standard_Up", 0, 2);
-                    CreateAnimationClip(sprites, folderName, "emote_standard_Left", 3, 5);
-                    CreateAnimationClip(sprites, folderName, "emote_standard_Down", 6, 8);
-                    CreateAnimationClip(sprites, folderName, "emote_standard_Right", 9, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_emote_standard_Up", 0, 2);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_emote_standard_Left", 3, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_emote_standard_Down", 6, 8);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_emote_standard_Right", 9, 11);
                 }
                 else if (fileName.Contains("halfslash.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "halfslash_standard_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "halfslash_standard_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "halfslash_standard_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "halfslash_standard_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_standard_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_standard_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_standard_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_halfslash_standard_Right", 18, 23);
                 }
                 else if (fileName.Contains("hurt.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "hurt_standard", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_hurt_standard", 0, 5);
 
                 }
                 else if (fileName.Contains("idle.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "idle_standard_Up", 0, 1);
-                    CreateAnimationClip(sprites, folderName, "idle_standard_Left", 2, 3);
-                    CreateAnimationClip(sprites, folderName, "idle_standard_Down", 4, 5);
-                    CreateAnimationClip(sprites, folderName, "idle_standard_Right", 6, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_idle_standard_Up", 0, 1);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_idle_standard_Left", 2, 3);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_idle_standard_Down", 4, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_idle_standard_Right", 6, 7);
                 }
                 else if (fileName.Contains("jump.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "jump_standard_Up", 0, 4);
-                    CreateAnimationClip(sprites, folderName, "jump_standard_Left", 5, 9);
-                    CreateAnimationClip(sprites, folderName, "jump_standard_Down", 10, 14);
-                    CreateAnimationClip(sprites, folderName, "jump_standard_Right", 15, 19);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_jump_standard_Up", 0, 4);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_jump_standard_Left", 5, 9);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_jump_standard_Down", 10, 14);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_jump_standard_Right", 15, 19);
                 }
                 else if (fileName.Contains("run.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "run_standard_Up", 0, 7);
-                    CreateAnimationClip(sprites, folderName, "run_standard_Left", 8, 15);
-                    CreateAnimationClip(sprites, folderName, "run_standard_Down", 16, 23);
-                    CreateAnimationClip(sprites, folderName, "run_standard_Right", 24, 31);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_run_standard_Up", 0, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_run_standard_Left", 8, 15);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_run_standard_Down", 16, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_run_standard_Right", 24, 31);
                 }
                 else if (fileName.Contains("shoot.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "shoot_standard_Up", 0, 12);
-                    CreateAnimationClip(sprites, folderName, "shoot_standard_Left", 13, 25);
-                    CreateAnimationClip(sprites, folderName, "shoot_standard_Down", 26, 38);
-                    CreateAnimationClip(sprites, folderName, "shoot_standard_Right", 39, 51);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_shoot_standard_Up", 0, 12);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_shoot_standard_Left", 13, 25);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_shoot_standard_Down", 26, 38);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_shoot_standard_Right", 39, 51);
                 }
                 else if (fileName.Contains("slash.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "slash_standard_Up", 0, 5);
-                    CreateAnimationClip(sprites, folderName, "slash_standard_Left", 6, 11);
-                    CreateAnimationClip(sprites, folderName, "slash_standard_Down", 12, 17);
-                    CreateAnimationClip(sprites, folderName, "shoot_standard_Right", 18, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_standard_Up", 0, 5);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_standard_Left", 6, 11);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_standard_Down", 12, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_slash_standard_Right", 18, 23);
                 }
 
                 else if (fileName.Contains("spellcast.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "spellcast_standard_Up", 0, 6);
-                    CreateAnimationClip(sprites, folderName, "spellcast_standard_Left", 7, 13);
-                    CreateAnimationClip(sprites, folderName, "spellcast_standard_Down", 14, 20);
-                    CreateAnimationClip(sprites, folderName, "spellcast_standard_Right", 21, 27);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_spellcast_standard_Up", 0, 6);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_spellcast_standard_Left", 7, 13);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_spellcast_standard_Down", 14, 20);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_spellcast_standard_Right", 21, 27);
                 }
                 else if (fileName.Contains("thrust.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "thrust_standard_Up", 0, 7);
-                    CreateAnimationClip(sprites, folderName, "thrust_standard_Left", 8, 15);
-                    CreateAnimationClip(sprites, folderName, "thrust_standard_Down", 16, 23);
-                    CreateAnimationClip(sprites, folderName, "thrust_standard_Right", 24, 31);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_standard_Up", 0, 7);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_standard_Left", 8, 15);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_standard_Down", 16, 23);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_thrust_standard_Right", 24, 31);
                 }
                 else if (fileName.Contains("walk.png"))
                 {
-                    CreateAnimationClip(sprites, folderName, "walk_standard_Up", 0, 8);
-                    CreateAnimationClip(sprites, folderName, "walk_standard_Left", 9, 17);
-                    CreateAnimationClip(sprites, folderName, "walk_standard_Down", 18, 26);
-                    CreateAnimationClip(sprites, folderName, "walk_standard_Right", 27, 35);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_standard_Up", 0, 8);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_standard_Left", 9, 17);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_standard_Down", 18, 26);
+                    CreateAnimationClip(sprites, folderName, $"{folderName}_walk_standard_Right", 27, 35);
                 }
             }
         }
@@ -663,79 +676,89 @@ public class SpriteLoader : MonoBehaviour
         // Cargar animaciones con comprobaciones
         if (File.Exists($"Assets/Sprites/{folderName}/idle_custom.png"))
         {
-            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/idle_custom.anim");
+            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_idle_custom.anim");
+            Debug.Log("Use Custom IDLE");
         }
         else
         {
-            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/idle_standard.anim");
+            idleClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_idle_standard_Down.anim");
+            Debug.Log("Use Standard IDLE");
         }
 
         if (File.Exists($"Assets/Sprites/{folderName}/walk_128.png"))
         {
-            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Right.anim");
-            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Down.anim");
-            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Up.anim");
-            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_Left.anim");
+            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_Right.anim");
+            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_Down.anim");
+            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_Up.anim");
+            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_Left.anim");
         }
         else
         {
-            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Right.anim");
-            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Down.anim");
-            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Up.anim");
-            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/walk_standard_Left.anim");
+            walkRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_standard_Right.anim");
+            walkDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_standard_Down.anim");
+            walkUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_standard_Up.anim");
+            walkLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_walk_standard_Left.anim");
         }
 
-        slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_128_Down.anim");
-        slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Up.anim");
-        slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Left.anim");
-        slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/Slash_32B_Right.anim");
-        deadClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/hurt_standard.anim");
+        slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Down.anim");
+        slashUpClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Up.anim");
+        slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Left.anim");
+        slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Right.anim");
+
+        deadClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_hurt_standard.anim");
 
         // Crear estados
-        AnimatorState idleState = stateMachine.AddState("IdleAnimation");
+        AnimatorState idleState = stateMachine.AddState("IdleAnimation", new Vector3(70, 90, 0));
         idleState.motion = idleClip;
+        idleState.speed = 1f; // Asegura que el "Idle" se repita (looping)
         stateMachine.defaultState = idleState;
 
-        AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation");
+        AnimatorState walkRightState = stateMachine.AddState("WalkRightAnimation", new Vector3(580, -140, 0));
         walkRightState.motion = walkRightClip;
-        AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown");
+        walkRightState.speed = 1f; // Repetir el caminar a la derecha en bucle
+
+        AnimatorState walkDownState = stateMachine.AddState("WalkAnimationDown", new Vector3(580, -80, 0));
         walkDownState.motion = walkDownClip;
-        AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp");
+        walkDownState.speed = 1f; // Repetir el caminar hacia abajo en bucle
+
+        AnimatorState walkUpState = stateMachine.AddState("WalkAnimationUp", new Vector3(580, 30, 0));
         walkUpState.motion = walkUpClip;
-        AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft");
+        walkUpState.speed = 1f; // Repetir el caminar hacia arriba en bucle
+
+        AnimatorState walkLeftState = stateMachine.AddState("WalkAnimationLeft", new Vector3(580, -20, 0));
         walkLeftState.motion = walkLeftClip;
-        AnimatorState slashDownState = stateMachine.AddState("Slash_Down");
+        walkLeftState.speed = 1f; // Repetir el caminar a la izquierda en bucle
+
+        AnimatorState slashDownState = stateMachine.AddState("Slash_Down", new Vector3(580, 80, 0));
         slashDownState.motion = slashDownClip;
-        AnimatorState slashUpState = stateMachine.AddState("Slash_Up");
+        slashDownState.speed = 1f; // Repetir el ataque hacia abajo
+
+        AnimatorState slashUpState = stateMachine.AddState("Slash_Up", new Vector3(580, 130, 0));
         slashUpState.motion = slashUpClip;
-        AnimatorState slashLeftState = stateMachine.AddState("Slash_Left");
+        slashUpState.speed = 1f; // Repetir el ataque hacia arriba
+
+        AnimatorState slashLeftState = stateMachine.AddState("Slash_Left", new Vector3(580, 180, 0));
         slashLeftState.motion = slashLeftClip;
-        AnimatorState slashRightState = stateMachine.AddState("Slash_Right");
+        slashLeftState.speed = 1f; // Repetir el ataque a la izquierda
+
+        AnimatorState slashRightState = stateMachine.AddState("Slash_Right", new Vector3(580, 230, 0));
         slashRightState.motion = slashRightClip;
-        AnimatorState deadState = stateMachine.AddState("IsDead");
+        slashRightState.speed = 1f; // Repetir el ataque a la derecha
+
+        AnimatorState deadState = stateMachine.AddState("IsDead", new Vector3(580, -210, 0));
         deadState.motion = deadClip;
 
-        // Transiciones desde Idle
-        idleState.AddTransition(walkRightState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingRight");
-        idleState.AddTransition(walkDownState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingDown");
-        idleState.AddTransition(walkUpState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingUp");
-        idleState.AddTransition(walkLeftState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingLeft");
-
-        // Transiciones desde Any State
-        AnimatorStateTransition anyToDead = stateMachine.AddAnyStateTransition(deadState);
-        anyToDead.AddCondition(AnimatorConditionMode.If, 0, "IsDead");
-
-        AnimatorStateTransition anyToSlashDown = stateMachine.AddAnyStateTransition(slashDownState);
-        anyToSlashDown.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingDown");
-
-        AnimatorStateTransition anyToSlashUp = stateMachine.AddAnyStateTransition(slashUpState);
-        anyToSlashUp.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingUp");
-
-        AnimatorStateTransition anyToSlashLeft = stateMachine.AddAnyStateTransition(slashLeftState);
-        anyToSlashLeft.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingLeft");
-
-        AnimatorStateTransition anyToSlashRight = stateMachine.AddAnyStateTransition(slashRightState);
-        anyToSlashRight.AddCondition(AnimatorConditionMode.If, 0, "IsAttackingRight");
+        // Transiciones desde Any State para todos los movimientos
+        stateMachine.AddAnyStateTransition(idleState).AddCondition(AnimatorConditionMode.If, 0, "IsIdle");
+        stateMachine.AddAnyStateTransition(walkRightState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingRight");
+        stateMachine.AddAnyStateTransition(walkDownState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingDown");
+        stateMachine.AddAnyStateTransition(walkUpState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingUp");
+        stateMachine.AddAnyStateTransition(walkLeftState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingLeft");
+        stateMachine.AddAnyStateTransition(slashDownState).AddCondition(AnimatorConditionMode.If, 0, "IsAttackingDown");
+        stateMachine.AddAnyStateTransition(slashUpState).AddCondition(AnimatorConditionMode.If, 0, "IsAttackingUp");
+        stateMachine.AddAnyStateTransition(slashLeftState).AddCondition(AnimatorConditionMode.If, 0, "IsAttackingLeft");
+        stateMachine.AddAnyStateTransition(slashRightState).AddCondition(AnimatorConditionMode.If, 0, "IsAttackingRight");
+        stateMachine.AddAnyStateTransition(deadState).AddCondition(AnimatorConditionMode.If, 0, "IsDead");
 
         Debug.Log("Animator Controller creado en: " + controllersFolderPath);
     }
@@ -787,15 +810,61 @@ public class SpriteLoader : MonoBehaviour
         Debug.Log("Prefab creado en: " + prefabPath);
     }
 
-
-
-    void CreateFolderPrefab(string folderName)
+    static void CrearAssetBundle(string folderName)
     {
-        string folderPath = $"Assets/Prefabs/{folderName}";
-        if (!Directory.Exists(folderPath))
+        Debug.Log($"Creando AssetBundle... {folderName}");
+        // El path del prefab desde donde se tomará el asset
+        string prefabPath = $"Assets/Prefabs/{folderName}.prefab"; // Cambia esta ruta al prefab que quieres
+
+        // Cargar el prefab desde el archivo
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+        if (prefab == null)
         {
-            Directory.CreateDirectory(folderPath);
+            Debug.LogError("No se encontró el prefab en la ruta especificada.");
+            return;
         }
+
+        // Obtenemos todas las dependencias del prefab (animaciones, sprites, materiales, etc.)
+        string[] dependencias = AssetDatabase.GetDependencies(new string[] { prefabPath });
+
+        // Definimos el nombre del AssetBundle
+        string assetBundleName = folderName;
+
+        // Establecer el nombre del AssetBundle para el prefab y sus dependencias
+        foreach (string dependencia in dependencias)
+        {
+            // Excluir scripts de las dependencias
+            if (dependencia.EndsWith(".cs"))
+            {
+                continue;
+            }
+
+            string assetPath = dependencia;
+            string bundlePath = "Assets/AssetBundles/" + assetBundleName;
+
+            // Cambiar el nombre del asset bundle para cada dependencia
+            AssetImporter assetImporter = AssetImporter.GetAtPath(assetPath);
+            assetImporter.assetBundleName = assetBundleName;
+        }
+
+        // Crear el directorio para guardar el AssetBundle si no existe
+        if (!System.IO.Directory.Exists("Assets/AssetBundles"))
+        {
+            System.IO.Directory.CreateDirectory("Assets/AssetBundles");
+        }
+
+        // Construir el AssetBundle en el directorio especificado
+        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows);
+
+        // Descargar el AssetBundle para liberar memoria
+        AssetBundle assetBundle = AssetBundle.LoadFromFile(Path.Combine("Assets/AssetBundles", assetBundleName));
+        if (assetBundle != null)
+        {
+            assetBundle.Unload(true);
+        }
+
+        Debug.Log("AssetBundle creado correctamente.");
     }
 
     void CreateFolderSprites(string folderName)

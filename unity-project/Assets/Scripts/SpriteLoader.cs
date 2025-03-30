@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -18,14 +19,14 @@ public class SpriteLoader : MonoBehaviour
         GameObject tempGameObject = new GameObject("SpriteLoaderTemp");
         if (tempGameObject == null)
         {
-            Debug.LogError("❌ Error al crear el GameObject 'SpriteLoaderTemp'.");
+            Debug.LogError("Error al crear el GameObject 'SpriteLoaderTemp'.");
             return;
         }
 
         SpriteLoader instance = tempGameObject.AddComponent<SpriteLoader>();
         if (instance == null)
         {
-            Debug.LogError("❌ Error al añadir el componente 'SpriteLoader'.");
+            Debug.LogError("Error al añadir el componente 'SpriteLoader'.");
             return;
         }
 
@@ -39,14 +40,14 @@ public class SpriteLoader : MonoBehaviour
 
     IEnumerator LoadSpritesFromServer()
     {
-        Debug.Log("🔄 Cargando sprites...");
+        Debug.Log("Cargando sprites...");
         using (UnityWebRequest request = UnityWebRequest.Get(spriteServerUrl))
         {
             yield return request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("❌ Error al obtener la lista de sprites: " + request.error);
+                Debug.LogError("Error al obtener la lista de sprites: " + request.error);
                 yield break;
             }
 
@@ -55,7 +56,7 @@ public class SpriteLoader : MonoBehaviour
             SpriteListWrapper spriteListWrapper = JsonUtility.FromJson<SpriteListWrapper>(request.downloadHandler.text);
             if (spriteListWrapper == null || spriteListWrapper.spriteLists == null)
             {
-                Debug.LogError("❌ Error al parsear la lista de sprites.");
+                Debug.LogError("Error al parsear la lista de sprites.");
                 yield break;
             }
 
@@ -70,7 +71,7 @@ public class SpriteLoader : MonoBehaviour
 
                 foreach (string spritePath in spritePaths)
                 {
-                    Debug.Log($"🔽 Descargando sprite: {spritePath}");
+                    Debug.Log($"Descargando sprite: {spritePath}");
                     yield return StartCoroutine(DownloadSprite(spritePath, folderName));
                 }
                 string folderPath = Path.Combine("Assets/Sprites", folderName);
@@ -98,11 +99,11 @@ public class SpriteLoader : MonoBehaviour
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("❌ Error al descargar el sprite: " + request.error);
+                    Debug.LogError("Error al descargar el sprite: " + request.error);
                     yield break;
                 }
 
-                Debug.Log("✅ Sprite descargado exitosamente");
+                Debug.Log("Sprite descargado exitosamente");
 
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
                 byte[] bytes = texture.EncodeToPNG();
@@ -114,7 +115,7 @@ public class SpriteLoader : MonoBehaviour
                 Debug.Log($"Guardando sprite en: {filePath}");
 
                 File.WriteAllBytes(filePath, bytes);
-                Debug.Log($"✅ Sprite descargado y guardado en: {filePath}");
+                Debug.Log($"Sprite descargado y guardado en: {filePath}");
             }
         }
 
@@ -128,11 +129,11 @@ public class SpriteLoader : MonoBehaviour
                                 .ToArray();
 
             if (files.Length == 0)
-                Debug.Log($"⚠️ No se encontraron imágenes en: {folder}");
+                Debug.Log($"No se encontraron imágenes en: {folder}");
 
             foreach (string file in files)
             {
-                Debug.Log($"🎨 Sprite encontrado: {file}");
+                Debug.Log($"Sprite encontrado: {file}");
 
                 // Lógica especial de recorte para ciertos archivos en "custom"
                 if (file.EndsWith("backslash_128.png"))
@@ -175,7 +176,7 @@ public class SpriteLoader : MonoBehaviour
                 {
                     ProcessCustomSprite(file, 2, 4); // Recorte personalizado (2 columnas x 4 filas)
                 }
-                // Lógica especial de recorte para ciertos archivos en "standard"
+                // Logica especial de recorte para ciertos archivos en "standard"
                 else if (file.EndsWith("backslash.png"))
                 {
                     ProcessCustomSprite(file, 13, 4); // Recorte personalizado (13 columnas x 4 filas)
@@ -248,7 +249,7 @@ public class SpriteLoader : MonoBehaviour
             ProcessSprite(assetPath, cols, rows);
         }
 
-        // Recorte estándar o personalizado
+        // Recorte standard o custom
         static void ProcessSprite(string assetPath, int cols, int rows)
         {
 
@@ -258,11 +259,11 @@ public class SpriteLoader : MonoBehaviour
 
             if (importer == null)
             {
-                Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {assetPath}");
+                Debug.LogWarning($"No se pudo cargar el sprite: {assetPath}");
                 return;
             }
 
-            Debug.Log($"🛠️ Modificando sprite: {assetPath}");
+            Debug.Log($"Modificando sprite: {assetPath}");
 
             // Aplicar configuración
             importer.textureType = TextureImporterType.Sprite;
@@ -276,7 +277,7 @@ public class SpriteLoader : MonoBehaviour
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
 
-            Debug.Log($"✅ Sprite modificado y reimportado: {assetPath}");
+            Debug.Log($"Sprite modificado y reimportado: {assetPath}");
         }
 
         // Recorte utilizando el número de columnas y filas específicos
@@ -285,11 +286,11 @@ public class SpriteLoader : MonoBehaviour
             Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(importer.assetPath);
             if (texture == null)
             {
-                Debug.LogError($"❌ No se pudo cargar la textura: {importer.assetPath}");
+                Debug.LogError($"No se pudo cargar la textura: {importer.assetPath}");
                 return new SpriteMetaData[0];
             }
 
-            Debug.Log($"📏 Grid aplicado: {cols} columnas, {rows} filas en {importer.assetPath}");
+            Debug.Log($"Grid aplicado: {cols} x {rows} en {importer.assetPath}");
 
             SpriteMetaData[] sprites = new SpriteMetaData[cols * rows];
 
@@ -334,7 +335,7 @@ public class SpriteLoader : MonoBehaviour
 
             if (importer == null)
             {
-                Debug.LogError($"❌ No se pudo cargar el importador de la textura: {walkSpritePath}");
+                Debug.LogError($"No se pudo cargar el importador de la textura: {walkSpritePath}");
                 return;
             }
 
@@ -346,7 +347,7 @@ public class SpriteLoader : MonoBehaviour
 
             if (sprites.Length < 20)
             {
-                Debug.LogError("❌ No se encontraron suficientes sprites en walk_128.png.");
+                Debug.LogError("No se encontraron suficientes sprites en walk_128.png.");
                 return;
             }
 
@@ -403,7 +404,7 @@ public class SpriteLoader : MonoBehaviour
             ProcessCustomSprite(Path.Combine(folder, "idle_custom.png"), 1, 2); // Recorte personalizado (1 columna x 2 filas)
 
             AssetDatabase.Refresh();
-            Debug.Log("✅ Nuevo sprite combinado generado: idle_custom.png");
+            Debug.Log("Nuevo sprite combinado generado: idle_custom.png");
         }
 
         static void ResizeSpritesInFolder(string folderPath, int targetSize)
@@ -415,7 +416,7 @@ public class SpriteLoader : MonoBehaviour
 
             if (files.Length == 0)
             {
-                Debug.Log($"⚠️ No se encontraron imágenes en: {folderPath}");
+                Debug.Log($"No se encontraron imágenes en: {folderPath}");
                 return;
             }
 
@@ -424,7 +425,7 @@ public class SpriteLoader : MonoBehaviour
                 TextureImporter importer = AssetImporter.GetAtPath(file) as TextureImporter;
                 if (importer == null)
                 {
-                    Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {file}");
+                    Debug.LogWarning($"No se pudo cargar el sprite: {file}");
                     continue;
                 }
 
@@ -432,7 +433,7 @@ public class SpriteLoader : MonoBehaviour
                 EditorUtility.SetDirty(importer);
                 importer.SaveAndReimport();
 
-                Debug.Log($"✅ Sprite redimensionado a {targetSize}px: {file}");
+                Debug.Log($"Sprite redimensionado a {targetSize}px: {file}");
             }
 
             AssetDatabase.Refresh();
@@ -641,11 +642,11 @@ public class SpriteLoader : MonoBehaviour
         static void CreateAnimationClip(Sprite[] sprites, string folderPath, string animationName, int start, int end)
         {
             Debug.Log($"Creando animación: {animationName} ({start}-{end})");
-            // Asegurarse de que los índices estén dentro de los límites del array
+            
             start = Mathf.Clamp(start, 0, sprites.Length - 1);
             end = Mathf.Clamp(end, 0, sprites.Length - 1);
 
-            // Verifica que el rango no sea inválido
+            // Verificar rango
             if (start >= end)
             {
                 Debug.LogWarning($"Rango inválido para la animación: {animationName} ({start}-{end})");
@@ -653,7 +654,7 @@ public class SpriteLoader : MonoBehaviour
             }
 
             AnimationClip clip = new AnimationClip();
-            clip.frameRate = 12; // 12 fotogramas por segundo
+            clip.frameRate = 12; // 12 foto/seg
 
             EditorCurveBinding spriteBinding = new EditorCurveBinding
             {
@@ -702,7 +703,7 @@ public class SpriteLoader : MonoBehaviour
             }
             else
             {
-                Debug.LogError("❌ Error al obtener la lista de personajes: " + response.ReasonPhrase);
+                Debug.LogError("Error al obtener la lista de personajes: " + response.ReasonPhrase);
                 return null;
             }
         }
@@ -715,7 +716,7 @@ public class SpriteLoader : MonoBehaviour
 
         if (characters == null)
         {
-            Debug.LogError("❌ No se pudo obtener la lista de personajes.");
+            Debug.LogError("No se pudo obtener la lista de personajes.");
             return;
         }
 
@@ -723,7 +724,7 @@ public class SpriteLoader : MonoBehaviour
 
         Personaje = characters.Find(c => c.name == folderName);
 
-        Debug.Log($"👤 Personaje {Personaje.id} encontrado: {Personaje.name} con arma: {Personaje.weapon}");
+        Debug.Log($"Personaje {Personaje.id} encontrado: {Personaje.name} con arma: {Personaje.weapon}");
 
         string controllersFolderPath = Path.Combine("Assets/Animations", folderName, $"{folderName}.controller");
         controllersFolderPath = CheckAndCorrectPath(controllersFolderPath);
@@ -793,7 +794,7 @@ public class SpriteLoader : MonoBehaviour
             slashLeftClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Left.anim");
             slashRightClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_slash_Right.anim");
         }
-        else if (Personaje.weapon.Equals("BOW")) 
+        else if (Personaje.weapon.Equals("BOW"))
         {
             Debug.Log("Use Standard SHOOT");
             slashDownClip = AssetDatabase.LoadAssetAtPath<AnimationClip>($"Assets/Animations/{folderName}/{folderName}_shoot_standard_Down.anim");
@@ -875,7 +876,7 @@ public class SpriteLoader : MonoBehaviour
         AnimatorState deadState = stateMachine.AddState("IsDead", new Vector3(580, -210, 0));
         deadState.motion = deadClip;
 
-        // Transiciones desde Any State para todos los movimientos
+        // Todo para AnyState
         stateMachine.AddAnyStateTransition(idleState).AddCondition(AnimatorConditionMode.If, 0, "IsIdle");
         stateMachine.AddAnyStateTransition(walkRightState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingRight");
         stateMachine.AddAnyStateTransition(walkDownState).AddCondition(AnimatorConditionMode.If, 0, "IsMovingDown");
@@ -943,7 +944,7 @@ public class SpriteLoader : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"❌ No se encontró el controlador de animación en: {controllerPath}");
+            Debug.LogError($"No se encontró el controlador de animación en: {controllerPath}");
         }
 
         // Crear la carpeta Prefabs si no existe
@@ -980,6 +981,8 @@ public class SpriteLoader : MonoBehaviour
             Directory.CreateDirectory(folderPath);
         }
     }
+
+    // Funcion Emergencia
     static void ResizeSpritesInFolder(string folderPath, int targetSize = 64)
     {
         string[] files = AssetDatabase.FindAssets("t:Texture2D", new[] { folderPath })
@@ -989,7 +992,7 @@ public class SpriteLoader : MonoBehaviour
 
         if (files.Length == 0)
         {
-            Debug.Log($"⚠️ No se encontraron imágenes en: {folderPath}");
+            Debug.Log($"No se encontraron imágenes en: {folderPath}");
             return;
         }
 
@@ -998,7 +1001,7 @@ public class SpriteLoader : MonoBehaviour
             TextureImporter importer = AssetImporter.GetAtPath(file) as TextureImporter;
             if (importer == null)
             {
-                Debug.LogWarning($"⚠️ No se pudo cargar el sprite: {file}");
+                Debug.LogWarning($"No se pudo cargar el sprite: {file}");
                 continue;
             }
 
@@ -1006,7 +1009,7 @@ public class SpriteLoader : MonoBehaviour
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
 
-            Debug.Log($"✅ Sprite redimensionado a {targetSize}px: {file}");
+            Debug.Log($"Sprite redimensionado a {targetSize}px: {file}");
         }
 
         AssetDatabase.Refresh();
@@ -1038,3 +1041,4 @@ public class SpriteLoader : MonoBehaviour
         public string weapon;
     }
 }
+# endif

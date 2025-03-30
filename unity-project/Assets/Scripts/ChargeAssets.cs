@@ -11,7 +11,7 @@ public class ChargeAssetsAssetBundleLoader : MonoBehaviour
     // Cargar el AssetBundle al iniciar
     void Start()
     {
-        StartCoroutine(LoadAssetBundle(assetBundleURL));
+        StartCoroutine(LoadAssetBundle(assetBundleURL + "/" + prefabName));
     }
 
     // Función para cargar el AssetBundle desde la URL

@@ -253,6 +253,13 @@ public class Tile : MonoBehaviour
         Vector3 startPosition = tileDestination.Character.transform.position;
         Vector3 endPosition = new Vector3(tileDestination.x, tileDestination.y, tileDestination.Character.transform.position.z);
         Vector3 aux = startPosition;
+        // Play walk SFX in a loop
+        PlayAudioManager audioManager = FindObjectOfType<PlayAudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.SFXSource.loop = true;
+            audioManager.PlayWalkSFX();
+        }
         // Move horizontally first
         path.Add(new Vector3(startPosition.x, startPosition.y, startPosition.z));
         while (startPosition.x != endPosition.x)
@@ -281,6 +288,12 @@ public class Tile : MonoBehaviour
         {
             MoveVertical(new object[] { tileDestination.Character, startPosition, endPosition, animator, tileDestination, aux });
         }
+        // Stop walk SFX after movement
+        if (audioManager != null)
+        {
+            audioManager.SFXSource.loop = false;
+            audioManager.SFXSource.Stop();
+        }
     }
 
     void MoveVertical(object[] parameters)
@@ -295,6 +308,13 @@ public class Tile : MonoBehaviour
 
         List<Vector3> path = new List<Vector3>();
         animator.SetTrigger("IsIdle");
+        // Play walk SFX in a loop
+        PlayAudioManager audioManager = FindObjectOfType<PlayAudioManager>();
+        if (audioManager != null)
+        {
+            audioManager.SFXSource.loop = true;
+            audioManager.PlayWalkSFX();
+        }
         //animator.SetTrigger("IsMovingRight");
         //animator.SetTrigger("IsMovingLeft");
 
@@ -329,6 +349,12 @@ public class Tile : MonoBehaviour
                 }
 
             }
+        }
+        // Stop walk SFX after movement
+        if (audioManager != null)
+        {
+            audioManager.SFXSource.loop = false;
+            audioManager.SFXSource.Stop();
         }
     }
     void OnMovementComplete(Animator animator)
@@ -544,6 +570,16 @@ public class Tile : MonoBehaviour
 
                 Debug.Log($"Attacking {attackDirection.Replace("IsAttacking", "").ToLower()}");
                 animator.SetTrigger(attackDirection);
+                // Play attack SFX
+                PlayAudioManager audioManager = FindObjectOfType<PlayAudioManager>();
+                if (audioManager != null)
+                {
+                    audioManager.PlayAttackSFX();
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ PlayAudioManager not found.");
+                }
                 StartCoroutine(ResetBoolAfterAnimation(animator, attackDirection));
             }
             else
@@ -561,6 +597,16 @@ public class Tile : MonoBehaviour
             {
                 Animator animator = targetTile.CharacterData.GetComponent<Animator>();
                 animator.SetTrigger("IsDead");
+                // Play death SFX
+                PlayAudioManager audioManager = FindObjectOfType<PlayAudioManager>();
+                if (audioManager != null)
+                {
+                    audioManager.PlayDeathSFX();
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ PlayAudioManager not found.");
+                }
                 StartCoroutine(WaitAndDestroy(targetTile.Character, 1));
                 targetTile.Character = null;
             }

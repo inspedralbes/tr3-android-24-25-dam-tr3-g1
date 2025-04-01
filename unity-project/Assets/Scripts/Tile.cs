@@ -266,11 +266,11 @@ public class Tile : MonoBehaviour
         Animator animator = tileDestination.Character.GetComponent<Animator>();
         if (aux.x < endPosition.x)
         {
-            animator.SetBool("IsMovingRight", true);
+            animator.SetTrigger("IsMovingRight");
         }
         else
         {
-            animator.SetBool("IsMovingLeft", true);
+            animator.SetTrigger("IsMovingLeft");
         }
         if (path.Count > 1)
         {
@@ -294,8 +294,9 @@ public class Tile : MonoBehaviour
 
 
         List<Vector3> path = new List<Vector3>();
-        animator.SetBool("IsMovingRight", false);
-        animator.SetBool("IsMovingLeft", false);
+        animator.SetTrigger("IsIdle");
+        //animator.SetTrigger("IsMovingRight");
+        //animator.SetTrigger("IsMovingLeft");
 
         path.Add(new Vector3(startPosition.x, startPosition.y, startPosition.z));
         while (startPosition.y != endPosition.y)
@@ -315,11 +316,11 @@ public class Tile : MonoBehaviour
 
                 if (endPosition.y < aux.y)
                 {
-                    animator.SetBool("IsMovingDown", true);
+                    animator.SetTrigger("IsMovingDown");
                 }
                 else
                 {
-                    animator.SetBool("IsMovingUp", true);
+                    animator.SetTrigger("IsMovingUp");
                 }
 
                 if (path.Count > 0)
@@ -332,10 +333,7 @@ public class Tile : MonoBehaviour
     }
     void OnMovementComplete(Animator animator)
     {
-        animator.SetBool("IsMovingDown", false);
-        animator.SetBool("IsMovingUp", false);
-        animator.SetBool("IsMovingRight", false);
-        animator.SetBool("IsMovingLeft", false);
+        animator.SetTrigger("IsIdle");
     }
     void OnMouseDown()
     {
@@ -463,7 +461,7 @@ public class Tile : MonoBehaviour
         Debug.Log($"Attacker: {attackerTile.CharacterData.name} | Health: {attackerTile.CharacterData.actualHealth} | ATK: {attackerTile.CharacterData.atk}");
         Debug.Log($"Defender: {this.CharacterData.name} | Health: {this.CharacterData.actualHealth} | ATK: {this.CharacterData.atk}");
 
-        int damage = attackerTile.CharacterData.atk;
+        int damage = (int)attackerTile.CharacterData.atk;
 
         switch (attackerTile.CharacterData.weapon)
         {
@@ -545,7 +543,7 @@ public class Tile : MonoBehaviour
                     attackDirection = "IsAttackingUp";
 
                 Debug.Log($"Attacking {attackDirection.Replace("IsAttacking", "").ToLower()}");
-                animator.SetBool(attackDirection, true);
+                animator.SetTrigger(attackDirection);
                 StartCoroutine(ResetBoolAfterAnimation(animator, attackDirection));
             }
             else
@@ -561,7 +559,9 @@ public class Tile : MonoBehaviour
             Debug.Log($"{targetTile.CharacterData.name} has been defeated!");
             if (targetTile.Character != null)
             {
-                Destroy(targetTile.Character);
+                Animator animator = targetTile.CharacterData.GetComponent<Animator>();
+                animator.SetTrigger("IsDead");
+                StartCoroutine(WaitAndDestroy(targetTile.Character, 1));
                 targetTile.Character = null;
             }
             targetTile.CharacterData = null;
@@ -575,10 +575,15 @@ public class Tile : MonoBehaviour
             RemoveFilters(tile);
         }
     }
+    private IEnumerator WaitAndDestroy(GameObject character, float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        Destroy(character);
+    }
     IEnumerator ResetBoolAfterAnimation(Animator animator, string boolName)
     {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-        animator.SetBool(boolName, false);
+        animator.SetTrigger("IsIdle");
     }
 
     Tile FindClosestMovableTile(Tile attackerTile, Tile targetTile)

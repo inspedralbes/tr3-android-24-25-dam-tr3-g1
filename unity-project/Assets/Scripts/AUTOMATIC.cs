@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -38,7 +39,7 @@ public class AnimationGenerator : MonoBehaviour
             string spriteSheetPath = Path.Combine(folderPath, animType + ".png");
             if (!File.Exists(spriteSheetPath))
             {
-                Debug.LogWarning("No se encontró la animación: " + spriteSheetPath);
+                Debug.LogWarning("No se encontrï¿½ la animaciï¿½n: " + spriteSheetPath);
                 continue;
             }
 
@@ -79,3 +80,4 @@ public class AnimationGenerator : MonoBehaviour
         AssetDatabase.CreateAsset(clip, folderPath + animationName + ".anim");
     }
 }
+#endif

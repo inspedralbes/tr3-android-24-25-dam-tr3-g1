@@ -210,8 +210,7 @@ MonoBehaviour:
   _tilePrefab: {fileID: 2510496763207566625, guid: 75f7b6853069f34488848d82abb65f6d, type: 3}
   _characterPrefab: {fileID: 3908282098490294866, guid: 47755f65185701b488ea15328bee0c7e, type: 3}
   _cam: {fileID: 1621116448}
-  _army1: []
-  _army2: []
+  turnManager: {fileID: 0}
 --- !u!4 &1106274592
 Transform:
   m_ObjectHideFlags: 0

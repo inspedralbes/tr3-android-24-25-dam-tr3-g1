@@ -93,20 +93,115 @@ public class Tile : MonoBehaviour
         }
         return null;
     }
+    public void attackUnitSocket(Tile tileOrigin, Tile tileDestination){
+        Debug.Log("AttackUnitSocket called");
+        Tile attackerTile = tileOrigin;
+        Tile targetTile = tileDestination;
+        if (tileOrigin == null || tileDestination == null)
+        {
+            Debug.LogWarning("Invalid tiles provided for attack.");
+            return;
+        }
 
+        if (tileOrigin.CharacterData == null || tileDestination.CharacterData == null)
+        {
+            Debug.LogWarning("One or both tiles do not have characters.");
+            return;
+        }
+
+        if (checkIfCharacterIsInTheSameArmyAsThePlayer(tileDestination.CharacterData, userId))
+        {
+            Debug.LogWarning("Cannot attack an allied unit.");
+            return;
+        }
+
+        int damage = tileOrigin.CharacterData.atk;
+
+        switch (tileOrigin.CharacterData.weapon)
+        {
+            case "SWORD":
+                damage = (int)(damage * tileDestination.CharacterData.vs_sword);
+                break;
+            case "SPEAR":
+                damage = (int)(damage * tileDestination.CharacterData.vs_spear);
+                break;
+            case "AXE":
+                damage = (int)(damage * tileDestination.CharacterData.vs_axe);
+                break;
+            case "BOW":
+                damage = (int)(damage * tileDestination.CharacterData.vs_bow);
+                break;
+            case "MAGIC":
+                damage = (int)(damage * tileDestination.CharacterData.vs_magic);
+                break;
+            default:
+                break;
+        }
+
+        tileDestination.CharacterData.actualHealth -= damage;
+
+        Debug.Log($"{tileOrigin.CharacterData.name} attacked {tileDestination.CharacterData.name} for {damage} damage. Remaining health: {tileDestination.CharacterData.actualHealth}");
+        if (Mathf.Abs(attackerTile.x - this.x) > 1 || Mathf.Abs(attackerTile.y - this.y) > 1)
+        {
+            Tile closestTile = FindClosestMovableTile(attackerTile, this);
+            if (closestTile != null)
+            {
+                Debug.Log($"Moving to closest attack position at: {closestTile.x}, {closestTile.y}");
+                moveUnit(attackerTile, closestTile);
+                attackerTile = findTileWithCharacterSelected();
+                StartCoroutine(AnimateAttackCoroutine(closestTile, this));
+                return;
+            }
+        }
+        if (tileDestination.CharacterData.actualHealth <= 0)
+        {
+            Debug.Log($"{tileDestination.CharacterData.name} has been defeated!");
+            if (tileDestination.Character != null)
+            {
+                Destroy(tileDestination.Character);
+                tileDestination.Character = null;
+            }
+            tileDestination.CharacterData = null;
+            tileDestination.isOccupied = false;
+        }
+
+    }
+    
+    public void moveUnitSocket(Tile tileOrigin, Tile tileDestination){
+        Debug.Log("MoveUnitSocket called");
+        tileDestination.Character = tileOrigin.Character;
+        tileDestination.CharacterData = tileOrigin.CharacterData;
+        tileDestination.isOccupied = true;
+        tileOrigin.Character = null;
+        tileOrigin.CharacterData = null;
+        tileOrigin.isOccupied = false;
+
+        if (tileDestination.CharacterData != null)
+        {
+            // tileDestination.CharacterData.hasMoved = true;
+            // tileDestination.CharacterData.selected = false;
+            unityMovesInAPath(tileDestination);
+        }
+        else
+        {
+            Debug.LogWarning("CharacterData is null. Cannot execute unityMovesInAPath.");
+        }
+        
+    }
+    
     public void moveUnit(Tile tileOrigin, Tile tileDestination)
     {
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager != null)
         {
             Character characterToMove = null;
-            if (turnManager.player1.army.Contains(tileOrigin.CharacterData))
+            if (checkIfCharacterIsInTheSameArmyAsThePlayer(tileOrigin.CharacterData, turnManager.player1.id))
             {
-                characterToMove = turnManager.player1.army.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = turnManager.player1.army[tileOrigin.CharacterData.internalId];
             }
-            else if (turnManager.player2.army.Contains(tileOrigin.CharacterData))
+            else if (checkIfCharacterIsInTheSameArmyAsThePlayer(tileOrigin.CharacterData, turnManager.player2.id))
             {
-                characterToMove = turnManager.player2.army.Find(c => c == tileOrigin.CharacterData);
+                characterToMove = turnManager.player2.army[tileOrigin.CharacterData.internalId - 4];
             }
             Debug.Log("Character to move: " + characterToMove.name);
             characterToMove.transform.SetParent(tileDestination.transform);
@@ -136,7 +231,7 @@ public class Tile : MonoBehaviour
         {
             tile.movable = false;
             tile.attackable = false;
-            RemoveFilters(tile); 
+            RemoveFilters(tile);
         }
 
         WebSocketManager.MoveData moveData = new WebSocketManager.MoveData
@@ -152,6 +247,8 @@ public class Tile : MonoBehaviour
 
     void unityMovesInAPath(Tile tileDestination)
     {
+        Debug.Log("Unity moves in a path");
+        Debug.Log("Tile destination: " + tileDestination.x + ", " + tileDestination.y);
         List<Vector3> path = new List<Vector3>();
         Vector3 startPosition = tileDestination.Character.transform.position;
         Vector3 endPosition = new Vector3(tileDestination.x, tileDestination.y, tileDestination.Character.transform.position.z);
@@ -177,6 +274,7 @@ public class Tile : MonoBehaviour
         }
         if (path.Count > 1)
         {
+            Debug.Log("Moving horizontally to: " + endPosition.x + ", " + endPosition.y);
             iTween.MoveTo(tileDestination.Character, iTween.Hash("path", path.ToArray(), "time", 1, "easetype", iTween.EaseType.linear, "oncomplete", "MoveVertical", "oncompletetarget", gameObject, "oncompleteparams", new object[] { tileDestination.Character, startPosition, endPosition, animator, tileDestination, aux }));
         }
         else
@@ -243,28 +341,56 @@ public class Tile : MonoBehaviour
     {
         Debug.Log("Mouse clicked tile.");
         Debug.Log($"Tile position: x = {x}, y = {y}");
-        Debug.Log("Character data: " + JsonUtility.ToJson(_characterData, true));
-        Debug.Log("Character: " + _character);
-        Debug.Log("TurnManager: " + turnManager.player1.ToString());
-        Debug.Log("TurnManager: " + turnManager.player2.ToString());
 
         GridManager gridManager = FindObjectOfType<GridManager>();
         if (gridManager == null) return;
-
-        if (this.attackable && _characterData != null && !turnManager.player1.army.Contains(_characterData))
+        Debug.Log(turnManager.player1.army[0].internalId);
+        Debug.Log(_characterData != null ? _characterData.internalId : "No character data");
+        int userId = UserManager.Instance.CurrentUser.id;
+        if (userId == turnManager.player1.id)
         {
-            Attack();
-            return;
-        }
-        else if (_characterData != null && !turnManager.player1.army.Contains(_characterData))
-        {
-            Debug.Log("Cannot control characters from army2.");
-            return;
+            if (this.attackable && _characterData != null && !checkIfCharacterIsInTheSameArmyAsThePlayer(_characterData, turnManager.player1.id))
+            {
+                Debug.Log("Attack action triggered!");
+                Attack();
+                return;
+            }
+            else if (_characterData != null && !checkIfCharacterIsInTheSameArmyAsThePlayer(_characterData, turnManager.player1.id))
+            {
+                if (turnManager.player1.id == userId)
+                {
+                    Debug.Log("Cannot control characters from army1.");
+                }
+                else if (turnManager.player2.id == userId)
+                {
+                    Debug.Log("Cannot control characters from army2.");
+                }
+                return;
+            }
+        } else{
+            if (this.attackable && _characterData != null && !checkIfCharacterIsInTheSameArmyAsThePlayer(_characterData, turnManager.player2.id))
+            {
+                Debug.Log("Attack action triggered!");
+                Attack();
+                return;
+            }
+            else if (_characterData != null && !checkIfCharacterIsInTheSameArmyAsThePlayer(_characterData, turnManager.player2.id))
+            {
+                if (turnManager.player1.id == userId)
+                {
+                    Debug.Log("Cannot control characters from army1.");
+                }
+                else if (turnManager.player2.id == userId)
+                {
+                    Debug.Log("Cannot control characters from army2.");
+                }
+                return;
+            }
         }
         Tile tileOriginMovement = findTileWithCharacterSelected();
         if (tileOriginMovement != null && tileOriginMovement != this && this.movable)
         {
-            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1 && this.attackable)
+            if (Mathf.Abs(tileOriginMovement.x - this.x) <= 1 && Mathf.Abs(tileOriginMovement.y - this.y) <= 1)
             {
                 Debug.Log("The destination tile is adjacent. No need to move.");
                 return;
@@ -289,12 +415,16 @@ public class Tile : MonoBehaviour
 
         if (_character != null)
         {
+            Debug.Log("Character selected: " + _character.name);
             ApplyGrayscale();
             showMovementRange(this, _characterData);
         }
     }
+
     void Attack()
     {
+
+       
         Debug.Log("Attack action triggered!");
 
         GridManager gridManager = FindObjectOfType<GridManager>();
@@ -322,6 +452,14 @@ public class Tile : MonoBehaviour
             return;
         }
 
+        WebSocketManager.AttackData AttackData = new WebSocketManager.AttackData
+        {
+            origin = new WebSocketManager.Position { x = attackerTile.x, y = attackerTile.y },
+            destination = new WebSocketManager.Position { x = this.x, y = this.y },
+            userId = userId
+        };
+        
+        WebSocketManager.Instance.SendAttack(AttackData);
         Debug.Log($"Attacker: {attackerTile.CharacterData.name} | Health: {attackerTile.CharacterData.actualHealth} | ATK: {attackerTile.CharacterData.atk}");
         Debug.Log($"Defender: {this.CharacterData.name} | Health: {this.CharacterData.actualHealth} | ATK: {this.CharacterData.atk}");
 
@@ -416,7 +554,7 @@ public class Tile : MonoBehaviour
             }
         }
 
-            attackerTile.CharacterData.selected = false;
+        attackerTile.CharacterData.selected = false;
 
         if (targetTile.CharacterData.actualHealth <= 0)
         {
@@ -466,6 +604,7 @@ public class Tile : MonoBehaviour
 
     void showMovementRange(Tile tile, Character _characterData)
     {
+        Debug.Log("Te enseño de que va la movida");
         // if (_characterData.hasMoved)
         // {
         //     return;
@@ -489,6 +628,7 @@ public class Tile : MonoBehaviour
                         GameObject foundTile = GameObject.Find($"Tile {x + i} {y + j}");
                         if (foundTile != null)
                         {
+                            Debug.Log("Found tile: " + foundTile.name);
                             ApplyTileBlue(foundTile.GetComponent<Tile>());
                         }
                     }
@@ -497,6 +637,7 @@ public class Tile : MonoBehaviour
                         GameObject foundTile = GameObject.Find($"Tile {x - i} {y + j}");
                         if (foundTile != null)
                         {
+                            Debug.Log("Found tile: " + foundTile.name);
                             ApplyTileBlue(foundTile.GetComponent<Tile>());
                         }
                     }
@@ -559,6 +700,7 @@ public class Tile : MonoBehaviour
 
     void ApplyTileBlue(Tile tile)
     {
+        Debug.Log("Applying blue tile");
         if (!tile.isOccupied)
         {
             Renderer renderer = tile.GetComponent<Renderer>();
@@ -575,9 +717,10 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
-                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
+                int userId = UserManager.Instance.CurrentUser.id;
+                if (tile.CharacterData != null && CharacterData != null && checkIfCharacterIsInTheSameArmyAsThePlayer(tile.CharacterData, userId) && checkIfCharacterIsInTheSameArmyAsThePlayer(CharacterData, userId))
                 {
+                    Debug.Log("Same army, do not mark as attackable");
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
                     if (renderer != null)
                     {
@@ -587,12 +730,13 @@ public class Tile : MonoBehaviour
                 }
                 else
                 {
+                    Debug.Log("Different army, mark as attackable");
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
                     if (renderer != null)
                     {
                         Material material = renderer.material;
                         material.color = Color.red;
-                         tile.attackable = true;
+                        tile.attackable = true;
                     }
                 }
             }
@@ -608,9 +752,9 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if ((turnManager.player1.army.Contains(tile.CharacterData) && turnManager.player1.army.Contains(CharacterData)) ||
-                    (turnManager.player2.army.Contains(tile.CharacterData) && turnManager.player2.army.Contains(CharacterData)))
+                if (checkIfCharacterIsInTheSameArmyAsThePlayer(tile.CharacterData, userId) && !checkIfCharacterIsInTheSameArmyAsThePlayer(CharacterData, userId))
                 {
+                    Debug.Log("Same army, do not mark as attackable");
                     // Same army, do not mark as attackable
                     tile.attackable = false;
                     return;
@@ -621,6 +765,7 @@ public class Tile : MonoBehaviour
         Renderer renderer = tile.GetComponent<Renderer>();
         if (renderer != null)
         {
+            Debug.Log("Applying red tile");
             Material material = renderer.material;
             material.color = Color.red;
             tile.attackable = true;
@@ -629,6 +774,7 @@ public class Tile : MonoBehaviour
 
     public void RemoveFilters(Tile tile)
     {
+        Debug.Log("Removing filters from tile: " + tile.name);
         Renderer renderer = tile.GetComponent<Renderer>();
         if (renderer != null)
         {
@@ -645,5 +791,32 @@ public class Tile : MonoBehaviour
             }
         }
     }
+    bool checkIfCharacterIsInTheSameArmyAsThePlayer(Character character, int userId)
+    {
+        if (character == null)
+        {
+            Debug.Log("No character found.");
+            return false;
+        }
+        Debug.Log("Character Id: " + character.id);
+        Debug.Log("Character: " + character.internalId);
+        if (userId == TurnManager.Instance.player1.id && character.internalId < 4)
+        {
+            Debug.Log("Se supone que eres el jugador 1 y el personaje está en el ejército 1");
+            return TurnManager.Instance.player1.army[character.internalId].id == character.id && turnManager.player1.army[character.internalId].actualHealth == character.actualHealth;
+        }
+        else
+        {
+            if (userId == TurnManager.Instance.player2.id && character.internalId > 3)
+            {
+                Debug.Log("Se supone que eres el jugador 2 y el personaje está en el ejército 2");
+                return TurnManager.Instance.player2.army[character.internalId - 4].id == character.id && turnManager.player2.army[character.internalId - 4].actualHealth == character.actualHealth;
+            }
+            else
+            {
+                Debug.Log("No eres el dueño del personaje");
+                return false;
+            }
+        }
+    }
 }
-

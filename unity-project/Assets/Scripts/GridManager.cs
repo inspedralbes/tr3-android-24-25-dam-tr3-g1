@@ -63,7 +63,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    void StartCharacter(int x, int y, Character characterData)
+    void StartCharacter(int x, int y, Character characterData, int army, int positionOnArray)
     {
         if (_characterPrefab != null)
         {
@@ -97,6 +97,11 @@ public class GridManager : MonoBehaviour
             {
                 var tileComponent = tile.GetComponent<Tile>();
                 tileComponent.Character = character;
+                if(army==1){
+                    characterComponent.internalId=positionOnArray;
+                } else{
+                    characterComponent.internalId=positionOnArray+4;
+                }
                 tileComponent.CharacterData = characterComponent;
                 tileComponent.isOccupied = true;
 
@@ -134,13 +139,15 @@ public class GridManager : MonoBehaviour
         // Place player 1's army
         for (int i = 0; i < TurnManager.Instance.player1.army.Count; i++)
         {
-            StartCharacter(0, _height / 2 - 2 + i, TurnManager.Instance.player1.army[i]);
+            StartCharacter(0, _height / 2 - 2 + i, TurnManager.Instance.player1.army[i], 1, i);
+            TurnManager.Instance.player1.army[i].internalId = i;
         }
 
         // Place player 2's army
         for (int i = 0; i < TurnManager.Instance.player2.army.Count; i++)
         {
-            StartCharacter(_width - 1, _height / 2 - 2 + i, TurnManager.Instance.player2.army[i]);
+            StartCharacter(_width - 1, _height / 2 - 2 + i, TurnManager.Instance.player2.army[i], 2, i);
+            TurnManager.Instance.player2.army[i].internalId = i + 4;
         }
     }
 

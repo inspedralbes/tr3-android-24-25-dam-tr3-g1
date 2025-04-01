@@ -17,6 +17,7 @@ public class WebSocketManager : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         if (Instance == null)
         {
             Instance = this;
@@ -26,6 +27,8 @@ public class WebSocketManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    
+       
     }
 
     async void Start()
@@ -61,13 +64,33 @@ public class WebSocketManager : MonoBehaviour
         await SendMessage(message);
     }
 
-    public async Task SendMove(string move)
+    public async Task SendAttack(AttackData attackData)
     {
-        // Crea un missatge JSON per enviar un moviment i l'envia
-        string message = $"{{\"type\": \"makeMove\", \"room\": \"{currentRoom}\", \"move\": \"{move}\"}}";
-        Debug.Log($"📤 Enviat: {message}");
-        await SendMessage(message);
+
+        Debug.Log("SEND ATTACK");
+        // Crea un objecte per al missatge complet
+        var messageObject = new
+        {
+            type = "makeAttack",
+            room = currentRoom,
+            attack = attackData 
+        };
+
+        // Serialitza l'objecte complet a JSON
+        string messageJson = JsonConvert.SerializeObject(messageObject);
+        Debug.Log($"📤 Enviat: {messageJson}");
+
+        // Envia el missatge serialitzat
+        await SendMessage(messageJson);
     }
+
+    // public async Task SendMove(string move)
+    // {
+    //     // Crea un missatge JSON per enviar un moviment i l'envia
+    //     string message = $"{{\"type\": \"makeMove\", \"room\": \"{currentRoom}\", \"move\": \"{move}\"}}";
+    //     Debug.Log($"📤 Enviat: {message}");
+    //     await SendMessage(message);
+    // }
 
     public async Task SendMove(WebSocketManager.MoveData moveData)
     {
@@ -123,6 +146,16 @@ public class WebSocketManager : MonoBehaviour
                 TurnManager.Instance.player1.army = MapCharacterDataToCharacter(matchFoundMessage.armies[0]);
                 TurnManager.Instance.player2.army = MapCharacterDataToCharacter(matchFoundMessage.armies[1]);
 
+                foreach (var character in TurnManager.Instance.player1.army)
+                {
+                    DontDestroyOnLoad(character.gameObject);
+                }
+
+                foreach (var character in TurnManager.Instance.player2.army)
+                {
+                    DontDestroyOnLoad(character.gameObject);
+                }
+
                 TurnManager.Instance.SetArmyReady(); // Mark armies as ready
 
                 currentRoom = matchFoundMessage.room;
@@ -163,16 +196,47 @@ public class WebSocketManager : MonoBehaviour
 
             if (tileOrigin != null && tileDestination != null)
             {
-                tileOrigin.moveUnit(tileOrigin, tileDestination);
+                tileOrigin.moveUnitSocket(tileOrigin, tileDestination);
             }
         }
         else if (message.Contains("\"gameOver\""))
         {
+            SceneManager.LoadScene("MenuScene");
             Debug.Log("🏁 Partida acabada!");
         }
         else if (message.Contains("\"queueJoined\""))
         {
             Debug.Log("👥 Usuari afegit a la cua!");
+        }
+        else if(message.Contains("\"opponentAttack\"")){
+            Debug.Log("🏹 L'oponent ha atacat!");
+            var opponentAttackMessage = JsonConvert.DeserializeObject<OpponentAttack>(message);
+
+            if (opponentAttackMessage == null || opponentAttackMessage.attack.origin == null )
+            {
+                Debug.LogError("❌ Error: opponentAttackMessage or its properties are null after deserialization.");
+                return;
+            }
+
+            Debug.Log($"🏹 Atac rebut: {opponentAttackMessage.attack.origin.x}, {opponentAttackMessage.attack.origin.y} -> {opponentAttackMessage.attack.destination.x}, {opponentAttackMessage.attack.destination.y}");
+
+            Tile tileOrigin = FindTile(opponentAttackMessage.attack.origin.x, opponentAttackMessage.attack.origin.y);
+            Tile tileDestination = FindTile(opponentAttackMessage.attack.destination.x, opponentAttackMessage.attack.destination.y);
+
+            if (tileOrigin == null)
+            {
+                Debug.LogError($"❌ Error: Tile at origin ({opponentAttackMessage.attack.origin.x}, {opponentAttackMessage.attack.origin.y}) not found.");
+            }
+
+            if (tileDestination == null)
+            {
+                Debug.LogError($"❌ Error: Tile at destination ({opponentAttackMessage.attack.destination.x}, {opponentAttackMessage.attack.destination.y}) not found.");
+            }
+
+            if (tileOrigin != null && tileDestination != null)
+            {
+                tileOrigin.attackUnitSocket(tileOrigin, tileDestination);
+            }
         }
     }
 
@@ -233,7 +297,13 @@ public class WebSocketManager : MonoBehaviour
 
         return characters;
     }
-
+ [System.Serializable]
+        public class AttackData
+        {
+            public Position origin;
+            public Position destination;
+            public int userId;
+        }
     [System.Serializable]
     public class MoveData
     {
@@ -254,5 +324,11 @@ public class WebSocketManager : MonoBehaviour
     {
         public string type;
         public MoveData move;
+    }
+
+    [System.Serializable]
+    public class OpponentAttack{
+        public string type;
+        public AttackData attack;
     }
 }

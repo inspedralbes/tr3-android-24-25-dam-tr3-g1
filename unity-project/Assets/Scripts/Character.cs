@@ -25,6 +25,7 @@ public class Character : MonoBehaviour
     public int price;
     public bool hasMoved;
     public bool selected;
+    public int internalId;
 
     [JsonIgnore]
     public CancellationToken destroyCancellationToken;

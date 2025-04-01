@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/OptionsScene.unity
     guid: 8a764a9c4d20fd84ab2078d274ef9d28
   - enabled: 1
+    path: Assets/Scenes/QueueScene.unity
+    guid: 24ec87a20d1315f4a97d5d4a57750573
+  - enabled: 1
+    path: Assets/Scenes/ArmyScene.unity
+    guid: eca3efb3cf0b1d9488156e3c859deedd
+  - enabled: 1
     path: Assets/Scenes/PlayScene.unity
     guid: 61a116d48b586e945a1173b38303a10c
   m_configObjects:

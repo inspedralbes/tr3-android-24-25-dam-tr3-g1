@@ -1,0 +1,4 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Queue.uss?fileID=7433441132597879392&amp;guid=462d3d31eb752d74794baa7a43b1bf88&amp;type=3#Queue" />
+    <engine:Label text="Buscant..." class="custom-label" />
+</engine:UXML>

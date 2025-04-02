@@ -63,12 +63,14 @@ public class WebSocketManager : MonoBehaviour
         // Crea un missatge JSON per unir-se a la cua i l'envia
         string message = $"{{\"type\": \"IWon\", \"userId\": {userId}, \"room\": \"{currentRoom}\"}}";
         await SendMessage(message);
+        SceneManager.LoadScene("WinScene");
     }
     public async Task ILost(int userId)
     {
         // Crea un missatge JSON per unir-se a la cua i l'envia
         string message = $"{{\"type\": \"ILost\", \"userId\": {userId}, \"room\": \"{currentRoom}\"}}";
         await SendMessage(message);
+        SceneManager.LoadScene("LooseScene");
     }
     public async Task JoinQueue(int userId)
     {

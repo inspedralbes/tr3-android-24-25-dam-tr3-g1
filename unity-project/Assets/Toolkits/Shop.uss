@@ -20,11 +20,10 @@
 .CardDisplay {
     background-color: rgb(255, 255, 255);
     border-radius: 10px;
-    height: ;
     flex-grow: 1;
     width: 100%;
     display: grid;
-    grid-template-columns: ;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     overflow: auto;
     box-sizing: border-box;
     margin-top: 50px;

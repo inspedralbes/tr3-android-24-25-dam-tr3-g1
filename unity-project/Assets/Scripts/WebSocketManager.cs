@@ -27,8 +27,8 @@ public class WebSocketManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    
-       
+
+
     }
 
     async void Start()
@@ -52,18 +52,25 @@ public class WebSocketManager : MonoBehaviour
 
     void Update()
     {
-    #if !UNITY_WEBGL || UNITY_EDITOR
+#if !UNITY_WEBGL || UNITY_EDITOR
         websocket.DispatchMessageQueue();
-    #endif
+#endif
     }
 
-    public async Task JoinQueue(int userId) 
+    public async Task JoinQueue(int userId)
     {
         // Crea un missatge JSON per unir-se a la cua i l'envia
         string message = $"{{\"type\": \"joinQueue\", \"userId\": {userId}}}";
         await SendMessage(message);
     }
+    public async Task changeTurn(userId id)
+    {
+        // Crea un missatge JSON per unir-se a la cua i l'envia
+        Debug.Log("SEND TURN CHANGE");
 
+        string message = $"{{\"type\": \"changeTurn\", \"userId\": {id.id}, \"room\": \"{currentRoom}\"}}";
+        await SendMessage(message);
+    }
     public async Task SendAttack(AttackData attackData)
     {
 
@@ -73,7 +80,7 @@ public class WebSocketManager : MonoBehaviour
         {
             type = "makeAttack",
             room = currentRoom,
-            attack = attackData 
+            attack = attackData
         };
 
         // Serialitza l'objecte complet a JSON
@@ -208,11 +215,12 @@ public class WebSocketManager : MonoBehaviour
         {
             Debug.Log("👥 Usuari afegit a la cua!");
         }
-        else if(message.Contains("\"opponentAttack\"")){
+        else if (message.Contains("\"opponentAttack\""))
+        {
             Debug.Log("🏹 L'oponent ha atacat!");
             var opponentAttackMessage = JsonConvert.DeserializeObject<OpponentAttack>(message);
 
-            if (opponentAttackMessage == null || opponentAttackMessage.attack.origin == null )
+            if (opponentAttackMessage == null || opponentAttackMessage.attack.origin == null)
             {
                 Debug.LogError("❌ Error: opponentAttackMessage or its properties are null after deserialization.");
                 return;
@@ -222,7 +230,11 @@ public class WebSocketManager : MonoBehaviour
 
             Tile tileOrigin = FindTile(opponentAttackMessage.attack.origin.x, opponentAttackMessage.attack.origin.y);
             Tile tileDestination = FindTile(opponentAttackMessage.attack.destination.x, opponentAttackMessage.attack.destination.y);
-
+            Tile tileClosest = null; // Initialize tileClosest to null
+            if (opponentAttackMessage.attack.closest != null)
+            {
+                tileClosest = FindTile(opponentAttackMessage.attack.closest.x, opponentAttackMessage.attack.closest.y);
+            }
             if (tileOrigin == null)
             {
                 Debug.LogError($"❌ Error: Tile at origin ({opponentAttackMessage.attack.origin.x}, {opponentAttackMessage.attack.origin.y}) not found.");
@@ -235,8 +247,16 @@ public class WebSocketManager : MonoBehaviour
 
             if (tileOrigin != null && tileDestination != null)
             {
-                tileOrigin.attackUnitSocket(tileOrigin, tileDestination);
+                Debug.Log($"IJIME DAME ZETTAI" + tileOrigin.x + " " + tileOrigin.y + " " + tileDestination.x + " " + tileDestination.y);
+                tileOrigin.attackUnitSocket(tileOrigin, tileDestination, tileClosest);
             }
+        }
+        else if (message.Contains("\"turnUpdate\""))
+        {
+            Debug.Log("🔄 Torn canviat!");
+            var changeTurnMessage = JsonConvert.DeserializeObject<ChangeTurnMessage>(message);
+            Debug.Log($"Torn rebut: {changeTurnMessage.turn}");
+            TurnManager.Instance.NextTurn(changeTurnMessage.turn);
         }
     }
 
@@ -289,7 +309,7 @@ public class WebSocketManager : MonoBehaviour
             character.atk = data.atk;
             character.movement = data.movement;
             character.health = data.health;
-            character.actualHealth = data.health; 
+            character.actualHealth = data.health;
             character.price = data.price;
 
             characters.Add(character);
@@ -297,13 +317,14 @@ public class WebSocketManager : MonoBehaviour
 
         return characters;
     }
- [System.Serializable]
-        public class AttackData
-        {
-            public Position origin;
-            public Position destination;
-            public int userId;
-        }
+    [System.Serializable]
+    public class AttackData
+    {
+        public Position origin;
+        public Position destination;
+        public Position closest;
+        public int userId;
+    }
     [System.Serializable]
     public class MoveData
     {
@@ -327,8 +348,20 @@ public class WebSocketManager : MonoBehaviour
     }
 
     [System.Serializable]
-    public class OpponentAttack{
+    public class OpponentAttack
+    {
         public string type;
         public AttackData attack;
+    }
+    [System.Serializable]
+    public class userId
+    {
+        public int id;
+    }
+    [System.Serializable]
+    public class ChangeTurnMessage
+    {
+        public string type;
+        public int turn;
     }
 }

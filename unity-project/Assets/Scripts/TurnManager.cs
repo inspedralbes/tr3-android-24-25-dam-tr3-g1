@@ -36,11 +36,17 @@ public class TurnManager : MonoBehaviour
     {
         
     }
+    public void ChangeTurn(){
 
-    public void NextTurn()
+        Debug.Log("SENDING CHANGE TURN");
+        WebSocketManager.userId userId = new WebSocketManager.userId(){
+            id = UserManager.Instance.CurrentUser.id
+        };
+        WebSocketManager.Instance.changeTurn(userId);
+    }
+    public void NextTurn(int NextTurn)
     {
-        currentPlayer = currentPlayer == 1 ? 2 : 1;
-        turn++;
+        turn = NextTurn;
     }
 
     public void Reset()

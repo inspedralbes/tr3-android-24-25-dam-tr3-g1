@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/PlayScene.unity
     guid: 61a116d48b586e945a1173b38303a10c
   - enabled: 1
+    path: Assets/Scenes/RegisterScene.unity
+    guid: f6201e469cc8dc74192cb991de014f28
+  - enabled: 1
     path: Assets/Scenes/ShopScene.unity
     guid: fe345c4163ba2564c8ce948fdf41a83e
   m_configObjects:

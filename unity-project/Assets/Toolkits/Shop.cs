@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+// #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -29,4 +29,4 @@ public class Shop : EditorWindow
         root.Add(labelFromUXML);
     }
 }
-#endif
+// #endif

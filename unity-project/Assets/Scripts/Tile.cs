@@ -771,6 +771,7 @@ public class Tile : MonoBehaviour
             {
                 Debug.Log($"Moving to closest attack position at: {closestTile.x}, {closestTile.y}");
                 moveUnit(attackerTile, closestTile, true);
+                attackerTile= closestTile;
             }
         }
 

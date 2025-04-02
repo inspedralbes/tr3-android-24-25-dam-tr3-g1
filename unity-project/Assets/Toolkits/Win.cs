@@ -3,16 +3,16 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Shop : EditorWindow
+public class Win : EditorWindow
 {
     [SerializeField]
     private VisualTreeAsset m_VisualTreeAsset = default;
 
-    [MenuItem("Window/UI Toolkit/Shop")]
+    [MenuItem("Window/UI Toolkit/Win")]
     public static void ShowExample()
     {
-        Shop wnd = GetWindow<Shop>();
-        wnd.titleContent = new GUIContent("Shop");
+        Win wnd = GetWindow<Win>();
+        wnd.titleContent = new GUIContent("Win");
     }
 
     public void CreateGUI()

@@ -1,18 +1,17 @@
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Shop : EditorWindow
+public class Loose : EditorWindow
 {
     [SerializeField]
     private VisualTreeAsset m_VisualTreeAsset = default;
 
-    [MenuItem("Window/UI Toolkit/Shop")]
+    [MenuItem("Window/UI Toolkit/Loose")]
     public static void ShowExample()
     {
-        Shop wnd = GetWindow<Shop>();
-        wnd.titleContent = new GUIContent("Shop");
+        Loose wnd = GetWindow<Loose>();
+        wnd.titleContent = new GUIContent("Loose");
     }
 
     public void CreateGUI()
@@ -29,4 +28,3 @@ public class Shop : EditorWindow
         root.Add(labelFromUXML);
     }
 }
-#endif

@@ -57,6 +57,19 @@ public class WebSocketManager : MonoBehaviour
 #endif
     }
 
+
+    public async Task IWon(int userId)
+    {
+        // Crea un missatge JSON per unir-se a la cua i l'envia
+        string message = $"{{\"type\": \"IWon\", \"userId\": {userId}, \"room\": \"{currentRoom}\"}}";
+        await SendMessage(message);
+    }
+    public async Task ILost(int userId)
+    {
+        // Crea un missatge JSON per unir-se a la cua i l'envia
+        string message = $"{{\"type\": \"ILost\", \"userId\": {userId}, \"room\": \"{currentRoom}\"}}";
+        await SendMessage(message);
+    }
     public async Task JoinQueue(int userId)
     {
         // Crea un missatge JSON per unir-se a la cua i l'envia
@@ -142,7 +155,7 @@ public class WebSocketManager : MonoBehaviour
         public List<List<CharacterData>> armies;
     }
 
-    void ProcessMessage(byte[] data)
+    async Task ProcessMessage(byte[] data)
     {
         string message = Encoding.UTF8.GetString(data);
         Debug.Log($"📩 Rebut: {message}");
@@ -215,8 +228,25 @@ public class WebSocketManager : MonoBehaviour
         }
         else if (message.Contains("\"gameOver\""))
         {
+            endGame endGameMessage = JsonConvert.DeserializeObject<endGame>(message);
+            if (endGameMessage == null || endGameMessage.reason == null)
+            {
+                Debug.LogError("❌ Error: endGameMessage or its properties are null after deserialization.");
+                return;
+            }
+            else
+            {
+                if (endGameMessage.winner == UserManager.Instance.CurrentUser.id)
+                {
+                    await IWon(UserManager.Instance.CurrentUser.id);
+                    }
+                else
+                {
+                    await ILost(UserManager.Instance.CurrentUser.id);
+                    }
+            }
             SceneManager.LoadScene("MenuScene");
-            Debug.Log("🏁 Partida acabada!");
+
         }
         else if (message.Contains("\"queueJoined\""))
         {
@@ -264,7 +294,8 @@ public class WebSocketManager : MonoBehaviour
             var changeTurnMessage = JsonConvert.DeserializeObject<ChangeTurnMessage>(message);
             Debug.Log($"Torn rebut: {changeTurnMessage.turn}");
             TurnManager.Instance.NextTurn(changeTurnMessage.turn);
-        } else if(message.Contains("\"endGame\""))
+        }
+        else if (message.Contains("\"endGame\""))
         {
             Debug.Log("🏁 Partida acabada!");
             SceneManager.LoadScene("MenuScene");
@@ -374,5 +405,13 @@ public class WebSocketManager : MonoBehaviour
     {
         public string type;
         public int turn;
+    }
+
+    [System.Serializable]
+    public class endGame
+    {
+        public string type;
+        public int winner;
+        public string reason;
     }
 }

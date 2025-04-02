@@ -209,6 +209,32 @@ public class Tile : MonoBehaviour
 
     }
 
+    int countCharactersFromArmy(int army)
+    {
+        int count = 0;
+        Character[] characters = FindObjectsOfType<Character>();
+        if(army == 1)
+        {
+            foreach (Character character in characters)
+            {
+                if (character.internalId < 4)
+                {
+                    count++;
+                }
+            }
+        }
+        else
+        {
+            foreach (Character character in characters)
+            {
+                if (character.internalId > 3)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
     public void moveUnit(Tile tileOrigin, Tile tileDestination, bool fromAttack)
     {
         if (tileOrigin.CharacterData != null && tileOrigin.CharacterData.hasMoved)
@@ -271,7 +297,7 @@ public class Tile : MonoBehaviour
                 }
 
             }
-            if (movedCharacters == 4)
+            if (movedCharacters == countCharactersFromArmy(2))
             {
                 turnManager.ChangeTurn();
                 turnManager.player1.army[0].hasMoved = false;
@@ -308,7 +334,7 @@ public class Tile : MonoBehaviour
                 }
 
             }
-            if (movedCharacters == 4)
+            if (movedCharacters == countCharactersFromArmy(1))
             {
                 turnManager.ChangeTurn();
                 turnManager.player1.army[0].hasMoved = false;
@@ -641,8 +667,83 @@ public class Tile : MonoBehaviour
         }
 
         this.CharacterData.actualHealth -= damage;
-        Debug.Log("MEGITSUME" + attackerTile.x + " " + attackerTile.y);
-        Debug.Log("MEGITSUME" + this.x + " " + this.y);
+        attackerTile.CharacterData.hasAttacked = true;
+        attackerTile.CharacterData.hasMoved = true;
+        if (attackerTile.CharacterData.internalId > 3)
+        {
+            int movedCharacters = 0;
+            Character[] characters = FindObjectsOfType<Character>();
+            foreach (Character character in turnManager.player2.army)
+            {
+                foreach (Character character2 in characters)
+                {
+                    if (character2.hasMoved && character2.internalId == character.internalId)
+                    {
+                        movedCharacters++;
+                        break;
+                    }
+                }
+
+            }
+            if (movedCharacters == countCharactersFromArmy(2))
+            {
+                turnManager.ChangeTurn();
+                turnManager.player1.army[0].hasMoved = false;
+                turnManager.player1.army[1].hasMoved = false;
+                turnManager.player1.army[2].hasMoved = false;
+                turnManager.player1.army[3].hasMoved = false;
+                turnManager.player2.army[0].hasMoved = false;
+                turnManager.player2.army[1].hasMoved = false;
+                turnManager.player2.army[2].hasMoved = false;
+                turnManager.player2.army[3].hasMoved = false;
+                foreach (Tile tile in FindObjectsOfType<Tile>())
+                {
+                    if (tile.CharacterData != null)
+                    {
+                        tile.CharacterData.hasMoved = false;
+                    }
+                }
+            }
+        }
+        else
+        {
+            int movedCharacters = 0;
+            Character[] characters = FindObjectsOfType<Character>();
+            foreach (Character character in turnManager.player1.army)
+            {
+                foreach (Character character2 in characters)
+                {
+                    if (character2.hasMoved && character2.internalId == character.internalId)
+                    {
+                        Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                        movedCharacters++;
+                        break;
+                    }
+                }
+
+            }
+            if (movedCharacters == countCharactersFromArmy(1))
+            {
+                turnManager.ChangeTurn();
+                turnManager.player1.army[0].hasMoved = false;
+                turnManager.player1.army[1].hasMoved = false;
+                turnManager.player1.army[2].hasMoved = false;
+                turnManager.player1.army[3].hasMoved = false;
+                turnManager.player2.army[0].hasMoved = false;
+                turnManager.player2.army[1].hasMoved = false;
+                turnManager.player2.army[2].hasMoved = false;
+                turnManager.player2.army[3].hasMoved = false;
+                foreach (Tile tile in FindObjectsOfType<Tile>())
+                {
+                    if (tile.CharacterData != null)
+                    {
+                        tile.CharacterData.hasMoved = false;
+                    }
+                }
+            }
+
+        }
+
         Debug.Log($"{attackerTile.CharacterData.name} attacked {this.CharacterData.name} for {damage} damage. Remaining health: {this.CharacterData.actualHealth}");
         if (Mathf.Abs(attackerTile.x - this.x) > 1 || Mathf.Abs(attackerTile.y - this.y) > 1)
         {
@@ -656,7 +757,7 @@ public class Tile : MonoBehaviour
         }
         else
         {
-             WebSocketManager.Instance.SendAttack(new WebSocketManager.AttackData
+            WebSocketManager.Instance.SendAttack(new WebSocketManager.AttackData
             {
                 origin = new WebSocketManager.Position { x = attackerTile.x, y = attackerTile.y },
                 destination = new WebSocketManager.Position { x = this.x, y = this.y },
@@ -703,6 +804,15 @@ public class Tile : MonoBehaviour
         if (this.CharacterData.actualHealth <= 0)
         {
             Debug.Log($"{this.CharacterData.name} has been defeated!");
+            if (checkIfArmyIsDead(this.CharacterData))
+            {
+                Debug.Log("Army is dead, ending game.");
+                WebSocketManager.Instance.SendEndGame(UserManager.Instance.CurrentUser.id);
+
+            }
+            {
+
+            }
             if (this.Character != null)
             {
                 Destroy(this.Character);
@@ -711,6 +821,41 @@ public class Tile : MonoBehaviour
             this.CharacterData = null;
             this.isOccupied = false;
         }
+
+
+    }
+    bool checkIfArmyIsDead(Character character)
+    {
+        if (character == null)
+        {
+            Debug.Log("No character found.");
+            return false;
+        }
+        Debug.Log("Character Id: " + character.id);
+        Debug.Log("Character: " + character.internalId);
+        Character[] characters = FindObjectsOfType<Character>();
+        foreach (Character c in characters)
+        {
+            if (character.internalId > 4)
+            {
+                if (c.internalId > 3 && c.internalId < 8 && c.actualHealth > 0)
+                {
+                    Debug.Log("Army 2 is not dead");
+                    return false;
+                }
+            }
+            else
+            {
+                if (c.internalId < 4 && c.internalId > -1 && c.actualHealth > 0)
+                {
+                    Debug.Log("Army 1 is not dead");
+                    return false;
+                }
+            }
+
+
+        }
+        return true;
     }
     IEnumerator AnimateAttackCoroutine(Tile attackerTile, Tile targetTile)
     {

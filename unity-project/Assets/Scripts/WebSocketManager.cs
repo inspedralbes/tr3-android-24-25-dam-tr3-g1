@@ -71,6 +71,13 @@ public class WebSocketManager : MonoBehaviour
         string message = $"{{\"type\": \"changeTurn\", \"userId\": {id.id}, \"room\": \"{currentRoom}\"}}";
         await SendMessage(message);
     }
+
+    public async Task SendEndGame(int userId)
+    {
+        // Crea un missatge JSON per unir-se a la cua i l'envia
+        string message = $"{{\"type\": \"endGame\", \"userId\": {userId}, \"room\": \"{currentRoom}\"}}";
+        await SendMessage(message);
+    }
     public async Task SendAttack(AttackData attackData)
     {
 
@@ -257,6 +264,10 @@ public class WebSocketManager : MonoBehaviour
             var changeTurnMessage = JsonConvert.DeserializeObject<ChangeTurnMessage>(message);
             Debug.Log($"Torn rebut: {changeTurnMessage.turn}");
             TurnManager.Instance.NextTurn(changeTurnMessage.turn);
+        } else if(message.Contains("\"endGame\""))
+        {
+            Debug.Log("🏁 Partida acabada!");
+            SceneManager.LoadScene("MenuScene");
         }
     }
 

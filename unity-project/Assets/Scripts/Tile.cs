@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class Tile : MonoBehaviour
 {
@@ -202,34 +203,29 @@ public class Tile : MonoBehaviour
         int count = 0;
         Character[] characters = FindObjectsOfType<Character>();
         List<int> characterIds = new List<int>();
-        if (army == 1)
-        {
-            foreach (Character character in characters)
-            {
-                Debug.Log("Character ID: " + character.internalId);
-                if (character.internalId < 4 && characterIds.Contains(character.internalId) == false)
-                {
-                    characterIds.Add(character.internalId);
-                    Debug.Log("Character ID: " + character.internalId);
-                    count++;
-                }
 
-            }
-        }
-        else
+        foreach (Character character in characters)
         {
-            foreach (Character character in characters)
+            if (character.actualHealth <= 0) continue; // No contar personajes muertos
+
+            if (army == 1 && character.internalId < 4 && !characterIds.Contains(character.internalId))
             {
-                if (character.internalId > 3 && characterIds.Contains(character.internalId) == false)
-                {
-                    characterIds.Add(character.internalId);
-                    Debug.Log("Character ID: " + character.internalId);
-                    count++;
-                }
+                characterIds.Add(character.internalId);
+                count++;
+                Debug.Log($"✅ Army 1 - Contado: {character.internalId}");
+            }
+            else if (army == 2 && character.internalId > 3 && !characterIds.Contains(character.internalId))
+            {
+                characterIds.Add(character.internalId);
+                count++;
+                Debug.Log($"✅ Army 2 - Contado: {character.internalId}");
             }
         }
+
+        Debug.Log($"📊 Total en Army {army}: {count}");
         return count;
     }
+
     public void moveUnit(Tile tileOrigin, Tile tileDestination, bool fromAttack)
     {
         if (tileOrigin.CharacterData != null && tileOrigin.CharacterData.hasMoved)
@@ -806,6 +802,7 @@ public class Tile : MonoBehaviour
             if (checkIfArmyIsDead(this.CharacterData))
             {
                 Debug.Log("Army is dead, ending game.");
+
                 WebSocketManager.Instance.SendEndGame(UserManager.Instance.CurrentUser.id);
 
             }
@@ -1194,28 +1191,26 @@ public class Tile : MonoBehaviour
     {
         if (character == null)
         {
-            Debug.Log("No character found.");
+            Debug.Log("⚠️ No character found.");
             return false;
         }
-        Debug.Log("Character Id: " + character.id);
-        Debug.Log("Character: " + character.internalId);
+
+        Debug.Log($"🔎 Validando personaje: {character.id}, internalId: {character.internalId}, Health: {character.actualHealth}");
+        Debug.Log($"🎮 Turno actual: {(TurnManager.Instance.player1.id == userId ? "Player 1" : "Player 2")}");
+
         if (userId == TurnManager.Instance.player1.id && character.internalId < 4)
         {
-            Debug.Log("Se supone que eres el jugador 1 y el personaje está en el ejército 1");
-            return TurnManager.Instance.player1.army[character.internalId].id == character.id && turnManager.player1.army[character.internalId].actualHealth == character.actualHealth;
+            Debug.Log("✅ Es jugador 1 y el personaje está en el ejército 1");
+            return TurnManager.Instance.player1.army.Any(c => c.id == character.id);
         }
-        else
+        else if (userId == TurnManager.Instance.player2.id && character.internalId > 3)
         {
-            if (userId == TurnManager.Instance.player2.id && character.internalId > 3)
-            {
-                Debug.Log("Se supone que eres el jugador 2 y el personaje está en el ejército 2");
-                return TurnManager.Instance.player2.army[character.internalId - 4].id == character.id && turnManager.player2.army[character.internalId - 4].actualHealth == character.actualHealth;
-            }
-            else
-            {
-                Debug.Log("No eres el dueño del personaje");
-                return false;
-            }
+            Debug.Log("✅ Es jugador 2 y el personaje está en el ejército 2");
+            return TurnManager.Instance.player2.army.Any(c => c.id == character.id);
         }
+
+        Debug.Log("❌ No eres el dueño del personaje");
+        return false;
     }
+
 }

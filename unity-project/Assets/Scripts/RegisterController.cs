@@ -17,9 +17,9 @@ public class RegisterController : MonoBehaviour
 
     private Button registerButton;
 
-    private const string registerUrl = "http://localhost:4000/newUSer";
+    private const string registerUrl = "http://lordgrids.dam.inspedralbes.cat:4000/newUSer";
     
-    private const string odooUrl = "http://localhost:4001/create-client";
+    private const string odooUrl = "http://lordgrids.dam.inspedralbes.cat:4001/create-client";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void OnEnable()

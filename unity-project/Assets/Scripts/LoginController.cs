@@ -17,7 +17,7 @@ public class LoginController : MonoBehaviour
     private Button registerButton;
 
     // URL de l'API on s'envien les credencials
-    private const string loginUrl = "http://localhost:4000/login"; 
+    private const string loginUrl = "http://lordgrids.dam.inspedralbes.cat:4000/login"; 
 
     private void OnEnable()
     {
@@ -88,7 +88,7 @@ public class LoginController : MonoBehaviour
                     UserManager.Instance.SetUser(user);
 
                     // Fa una crida addicional per obtenir els personatges de l'usuari
-                    string charactersUrl = $"http://localhost:4000/armies/{UserManager.Instance.CurrentUser.id}/characters";
+                    string charactersUrl = $"http://lordgrids.dam.inspedralbes.cat:4000/armies/{UserManager.Instance.CurrentUser.id}/characters";
                     using (UnityWebRequest charactersRequest = UnityWebRequest.Get(charactersUrl))
                     {
                         yield return charactersRequest.SendWebRequest();

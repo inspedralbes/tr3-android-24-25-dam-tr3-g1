@@ -92,7 +92,7 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator FetchCharacters()
     {
-        UnityWebRequest request = UnityWebRequest.Get("http://localhost:4000/getCharactersOwned/7");
+        UnityWebRequest request = UnityWebRequest.Get("http://lordgrids.dam.inspedralbes.cat:4000/getCharactersOwned/7");
         yield return request.SendWebRequest();
         Debug.Log("Fetching characters");
         Debug.Log(request.result);
@@ -122,7 +122,7 @@ public class ArmyController : MonoBehaviour
 
     private IEnumerator FetchUserArmy()
     {
-        UnityWebRequest request = UnityWebRequest.Get($"http://localhost:4000/armies/{userId}");
+        UnityWebRequest request = UnityWebRequest.Get($"http://lordgrids.dam.inspedralbes.cat:4000/armies/{userId}");
         yield return request.SendWebRequest();
 
         Debug.Log(request.downloadHandler.text);
@@ -192,7 +192,7 @@ public class ArmyController : MonoBehaviour
         Debug.Log("Updating army: " + jsonData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
-        using (UnityWebRequest request = new UnityWebRequest($"http://localhost:4000/armies/{userId}", "PUT"))
+        using (UnityWebRequest request = new UnityWebRequest($"http://lordgrids.dam.inspedralbes.cat:4000/armies/{userId}", "PUT"))
         {
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();

@@ -10,7 +10,7 @@ public class AssetBundleUploader : EditorWindow
 {
     private static readonly string prefabFolderPath = "Assets/Prefabs";
     private static readonly string assetBundlePath = "Assets/AssetBundles";
-    private static readonly string uploadUrl = "http://localhost:4000/AssetBundles";
+    private static readonly string uploadUrl = "http://lordgrids.dam.inspedralbes.cat:4000/AssetBundles";
 
     [MenuItem("Tools/Build & Upload AssetBundles")]
     public static void BuildAndUpload()

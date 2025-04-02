@@ -12,7 +12,7 @@ public class WebSocketManager : MonoBehaviour
 {
     public static WebSocketManager Instance { get; private set; }
     private WebSocket websocket;
-    private string serverUrl = "ws://localhost:4000";
+    private string serverUrl = "ws://lordgrids.dam.inspedralbes.cat:4000";
     private string currentRoom; // Field to store the current room
 
     private void Awake()

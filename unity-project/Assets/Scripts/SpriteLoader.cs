@@ -33,8 +33,8 @@ public class SpriteLoader : MonoBehaviour
         instance.StartCoroutine(instance.LoadSpritesFromServer());
     }
 
-    public string characterListUrl = "http://localhost:4000/characters";
-    public string spriteServerUrl = "http://localhost:4000/sprites";
+    public string characterListUrl = "http://lordgrids.dam.inspedralbes.cat:4000/characters";
+    public string spriteServerUrl = "http://lordgrids.dam.inspedralbes.cat:4000/sprites";
 
     string assetBundlePath = "Assets/AssetBundles/";
 

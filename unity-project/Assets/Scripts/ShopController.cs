@@ -42,7 +42,7 @@ public class ShopController : MonoBehaviour
 
     private IEnumerator FetchPlayerPoints()
     {
-        UnityWebRequest request = UnityWebRequest.Get("http://localhost:4000/users/" + userid + "/points");
+        UnityWebRequest request = UnityWebRequest.Get("http://lordgrids.dam.inspedralbes.cat:4000/users/" + userid + "/points");
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
@@ -84,7 +84,7 @@ public class ShopController : MonoBehaviour
 
     private IEnumerator FetchCharactersNotBought()
     {
-        UnityWebRequest request = UnityWebRequest.Get("http://localhost:4000/getCharactersNotOwned/" + userid);
+        UnityWebRequest request = UnityWebRequest.Get("http://lordgrids.dam.inspedralbes.cat:4000/getCharactersNotOwned/" + userid);
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
@@ -110,7 +110,7 @@ public class ShopController : MonoBehaviour
                 card.Add(nameLabel);
 
                 var image = new Image();
-                StartCoroutine(LoadImage("localhost:4000" + character.icon, image));
+                StartCoroutine(LoadImage("lordgrids.dam.inspedralbes.cat:4000" + character.icon, image));
                 card.Add(image);
 
                 var buyButton = new Button() { text = character.price.ToString() };
@@ -141,7 +141,7 @@ public class ShopController : MonoBehaviour
 
     private IEnumerator BuyCharacter(int characterId, int price)
     {
-        UnityWebRequest request = new UnityWebRequest("http://localhost:4000/buyCharacter", "POST");
+        UnityWebRequest request = new UnityWebRequest("http://lordgrids.dam.inspedralbes.cat:4000/buyCharacter", "POST");
         request.SetRequestHeader("Content-Type", "application/json");
 
         var requestBody = new

@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 public class ChargeAssetsAssetBundleLoader : MonoBehaviour
 {
     // URL donde está el AssetBundle
-    public string assetBundleURL = "http://localhost:4000/AssetBundles";
+    public string assetBundleURL = "http://lordgrids.dam.inspedralbes.cat:4000/AssetBundles";
     public string prefabName = "LL";
 
     // Cargar el AssetBundle al iniciar

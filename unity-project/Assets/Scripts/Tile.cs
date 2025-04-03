@@ -115,12 +115,6 @@ public class Tile : MonoBehaviour
             return;
         }
 
-        // if (checkIfCharacterIsInTheSameArmyAsThePlayer(tileDestination.CharacterData, userId))
-        // {
-        //     Debug.LogWarning("Cannot attack an allied unit.");
-        //     return;
-        // }
-
         int damage = tileOrigin.CharacterData.atk;
 
         switch (tileOrigin.CharacterData.weapon)
@@ -1115,7 +1109,17 @@ public class Tile : MonoBehaviour
             if (gridManager != null)
             {
                 int userId = UserManager.Instance.CurrentUser.id;
-                if (tile.CharacterData != null && CharacterData != null && checkIfCharacterIsInTheSameArmyAsThePlayer(tile.CharacterData, userId) && checkIfCharacterIsInTheSameArmyAsThePlayer(CharacterData, userId))
+                if (tile.CharacterData.internalId>3&&UserManager.Instance?.CurrentUser.id==turnManager.player2.id)
+                {
+                    Debug.Log("Same army, do not mark as attackable");
+                    Renderer renderer = tile.Character.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        Material material = renderer.material;
+                        material.color = Color.green;
+                    }
+                }
+                else if (tile.CharacterData.internalId<4&&UserManager.Instance?.CurrentUser.id==turnManager.player1.id)
                 {
                     Debug.Log("Same army, do not mark as attackable");
                     Renderer renderer = tile.Character.GetComponent<Renderer>();
@@ -1149,7 +1153,7 @@ public class Tile : MonoBehaviour
             GridManager gridManager = FindObjectOfType<GridManager>();
             if (gridManager != null)
             {
-                if (checkIfCharacterIsInTheSameArmyAsThePlayer(tile.CharacterData, userId) && !checkIfCharacterIsInTheSameArmyAsThePlayer(CharacterData, userId))
+                if ((tile.CharacterData.internalId>3&&UserManager.Instance?.CurrentUser.id==turnManager.player2.id) || (tile.CharacterData.internalId<4&&UserManager.Instance?.CurrentUser.id==turnManager.player1.id))
                 {
                     Debug.Log("Same army, do not mark as attackable");
                     // Same army, do not mark as attackable

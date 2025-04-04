@@ -1,0 +1,13 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Login.uss?fileID=7433441132597879392&amp;guid=bf244f1035b666a419cdc9bf8cb08118&amp;type=3#Login" />
+    <engine:VisualElement name="Background" class="Background" style="flex-grow: 1; overflow: visible;">
+        <engine:VisualElement style="flex-grow: 1;">
+            <engine:TextField label="Email:" placeholder-text="filler text" name="email" class="title" style="justify-content: flex-end; align-items: center;" />
+            <engine:TextField label="Password:" placeholder-text="filler text" name="password" password="true" class="title" />
+        </engine:VisualElement>
+        <engine:VisualElement class="menu-button-container" style="flex-grow: 1; bottom: 0; max-height: 50%; height: 50%;">
+            <engine:Button text="Log In" name="login" class="menu-button" />
+            <engine:Button text="Registra&apos;t" name="Registrat" class="menu-button" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

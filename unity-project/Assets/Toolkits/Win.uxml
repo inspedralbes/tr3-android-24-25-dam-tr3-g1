@@ -1,0 +1,7 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Win.uss?fileID=7433441132597879392&amp;guid=9adcb02e1b33bb6498c2ba67432d511c&amp;type=3#Win" />
+    <engine:VisualElement class="container" style="flex-grow: 1;">
+        <engine:Label text="Has Guanyat!!!" class="title custom-label" />
+        <engine:Button text="Tornar al menú" class="menu-button" />
+    </engine:VisualElement>
+</engine:UXML>

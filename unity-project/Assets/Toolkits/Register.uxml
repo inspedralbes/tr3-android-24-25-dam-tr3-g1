@@ -1,0 +1,14 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Register.uss?fileID=7433441132597879392&amp;guid=bc15669acdd23fb40a5cf4fc232dc96b&amp;type=3#Register" />
+    <engine:VisualElement name="Background" class="Background" style="flex-grow: 1; overflow: visible;">
+        <engine:VisualElement style="flex-grow: 1; height: 344px; width: 371px;">
+            <engine:TextField label="Nom d&apos;usuari" placeholder-text="Nom d&apos;usuari" name="username" class="title" style="justify-content: flex-end; align-items: center;" />
+            <engine:TextField label="Correu:" placeholder-text="exemple@gmail.com" name="email" class="title" style="justify-content: flex-end; align-items: center;" />
+            <engine:TextField label="Contrasenya:" placeholder-text="123456" name="password" hide-mobile-input="false" auto-correction="false" password="true" class="title" />
+        </engine:VisualElement>
+        <engine:VisualElement class="menu-button-container" style="flex-grow: 1; height: 40%; width: 100%; max-height: 50%; bottom: 7px; left: 0;">
+            <engine:Button text="Enregistrarse" name="register" class="menu-button" />
+            <engine:Button text="Fer login" name="goToLogin" class="menu-button" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

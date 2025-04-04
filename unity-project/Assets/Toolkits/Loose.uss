@@ -1,0 +1,49 @@
+.menu-button {
+    font-family: "ThaleahPixelFont";
+    background-color: rgb(68, 138, 255);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 150%;
+    -unity-font-style: bold;
+    width: 80%;
+    text-align: center;
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.menu-button:hover {
+    font-family: "ThaleahPixelFont";
+    background-color: rgb(115, 159, 236);
+    color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 150%;
+    -unity-font-style: bold;
+    width: 80%;
+    text-align: center;
+}
+
+.container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    display: flex;
+}
+
+.custom-label {
+    font-size: 40px;
+    -unity-font-style: bold;
+    color: rgb(68, 138, 255);
+    -unity-font-definition: url("project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&guid=585188cdc4600544eb408bee749e4b3a&type=3#ThaleahFat_TTF");
+}
+
+.container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    display: flex;
+}

@@ -1,0 +1,21 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Toolkits/Army.uss?fileID=7433441132597879392&amp;guid=a2981254d0c9afc40a63440d004f1ebe&amp;type=3#Army" />
+    <engine:VisualElement class="root">
+        <engine:VisualElement class="left-column">
+            <engine:GroupBox>
+                <engine:DropdownField label="Unit 1" class="foldout-bonic" style="-unity-font-definition: url(&quot;project://database/Assets/Thaleah_PixelFont/Materials/ThaleahFat_TTF.ttf?fileID=12800000&amp;guid=585188cdc4600544eb408bee749e4b3a&amp;type=3#ThaleahFat_TTF&quot;);" />
+                <engine:DropdownField label="Unit 2" class="foldout-bonic" />
+                <engine:DropdownField label="Unit 3" class="foldout-bonic" />
+                <engine:DropdownField label="Unit 4" class="foldout-bonic" />
+            </engine:GroupBox>
+            <engine:Button text="Update" name="update" class="menu-button" />
+            <engine:Button text="Play" name="play" class="menu-button" />
+        </engine:VisualElement>
+        <engine:VisualElement class="right-column">
+            <engine:Label text="Unit 1 Stats" name="unit1Stats" class="label-bonic" />
+            <engine:Label text="Unit 2 Stats" name="unit2Stats" class="label-bonic" />
+            <engine:Label text="Unit 3 Stats" name="unit3Stats" class="label-bonic" />
+            <engine:Label text="Unit 4 Stats" name="unit4Stats" class="label-bonic" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
